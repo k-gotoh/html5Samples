@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<script type="text/javascript" src="./jquery-1.9.0.js"></script>
+<script type="text/javascript" src="./textualizer.js"></script>
+
+<script type="text/javascript">
+$(function() {
+    var list = ['aaaaaaaaaaaaa', 'bbbbbbbbbbbbbbb', 'xxxxxxxxxxxxxxxxxxxxxx']; // 目的のテキストを指定
+    var txt = $('#sample'); // id名を指定
+    var options = {
+        duration: 1000,
+        rearrangeDuration: 1000,
+        effect: 'random',
+        centered: true
+    }
+ 
+    txt.textualizer(list, options);
+    txt.textualizer('start');
+});
+
+</script>
+</head>
+<body>
+
+<div id="sample">aaa</div>
+
+</body>
+</html>

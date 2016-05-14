@@ -1,0 +1,142 @@
+<!DOCTYPE html
+<html>
+<head>
+<meta charset="UTF-8" />
+
+<link rel="stylesheet" href="./css/uoul.css">
+<link rel="stylesheet" href="./css/title.css" type="text/css" />
+<link rel="stylesheet" href="./css/button.css" type="text/css" />
+<link rel="stylesheet" href="./css/header.css" />
+<style type="text/css">
+.bloodtype-list {
+	padding:0;
+}
+
+	.bloodtype-list li {
+		display:inline;
+		list-style-type:none;
+	}
+
+	.bloodtype-list label {
+		display:inline-block;
+		font-family:Verdana, Geneva, Arial, Helvetica, sans-serif;
+		font-size:0.8em;
+		padding:0.3em 1em;
+		background-color:#ddd;
+		color:#999;
+		border:2px solid #bbb;
+		border-radius:20px;
+		text-shadow:1px 1px 1px #fff;
+		box-shadow:inset 1px 1px 5px #fff;
+		cursor:pointer;
+	}
+
+	.bloodtype-list label:hover {
+		border-color:#69a;
+		color:#69a;
+	}
+
+	.bloodtype-list label.selected {
+		color:#fff;
+		background-color:#37a;
+		box-shadow: inset 0px 0px 10px #036;
+		border-color:#036;
+		text-shadow:-1px -1px 1px #036;
+	}
+
+	.bloodtype-list label input {
+		display:none;
+	}
+
+
+iframe {-moz-border-radius: 25px;
+-webkit-border-radius: 25px;
+border-radius: 25px;
+/*IE 7 AND 8 DO NOT SUPPORT BORDER RADIUS*/
+-moz-box-shadow: 0px 0px 20px #000000;
+-webkit-box-shadow: 0px 0px 20px #000000;
+box-shadow: 0px 0px 20px #000000;
+/*IE 7 AND 8 DO NOT SUPPORT BLUR PROPERTY OF SHADOWS*/
+}
+
+
+</style>
+
+
+<script src="./js/jquery.min.js"></script>
+
+<script>
+
+</script>
+</head>
+<body>
+<script src="./js/settingHeader.js"></script>
+<table border="0"><tr><td width="350px">
+<p class="title"> 辞書登録</p></td>
+</tr></table>
+<br />
+<form class="question">
+
+	<ul class="bloodtype-list">
+		<li><label><input type="radio" name="bloodtype" value="je" />日→英</label></li>
+		<li><label><input type="radio" name="bloodtype" value="B" />日→中</label></li>
+		<li><label><input type="radio" name="bloodtype" value="O" />日→韓</label></li>
+		<li><label><input type="radio" name="bloodtype" value="AB" />日→ロシア</label></li>
+		<li><label><input type="radio" name="bloodtype" value="A" />日→スペイン</label></li>
+		<li><label><input type="radio" name="bloodtype" value="B" />日→ドイツ</label></li>
+		<li><label><input type="radio" name="bloodtype" value="O" />日→フランス</label></li>
+		<li><label><input type="radio" name="bloodtype" value="AB" />日→イタリア</label></li>
+		<li><label><input type="radio" name="bloodtype" value="A" />日→インドネシア</label></li>
+		<li><label><input type="radio" name="bloodtype" value="B" />日→タイ</label></li>
+		<li><label><input type="radio" name="bloodtype" value="O" />日→アラビア</label></li>
+
+</form>
+<script>
+/**
+ * As jQuery plugin
+ */
+(function(){
+
+	// return;
+
+	$.fn.extend({
+		toggleButtons : function(callback){
+			var radios = this;
+			radios.on("change", function(e){
+				radios.closest("label").removeClass("selected");
+				$(e.target).closest("label").addClass("selected");
+				callback.call(this, e);
+			});
+			radios.closest("label").on("click", function(e){
+				var input = $(this).find("input");
+				if(! input.prop("checked")){
+					input.prop("checked", true).trigger("change");
+				}
+			});
+			radios.filter(":first").trigger("change");
+		}
+	});
+
+	$("input[name=bloodtype]").toggleButtons(function(){
+		console.log(this);
+		console.log(arguments);
+	});
+
+}());
+
+
+$("input[name=bloodtype]").toggleButtons(function(e){
+     // 選択変更時に何かする
+     console.log("Changed to " + e.target.value);
+document.dicSub.submit();
+});
+</script>
+<br />
+<br />
+<br />
+<form id="dicSub" name="dicSub" action="./dicMasterSub.html" method="post" target="dicFrame">
+<input type="hidden" id="selectedEid" />
+</form>
+<iframe src="./blank.html" id="dicFrame"  name="dicFrame"  frameborder="0" width="1200px" height="500px" />
+</body>
+</html>

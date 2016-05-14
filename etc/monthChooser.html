@@ -1,0 +1,76 @@
+<!doctype html>
+<html>
+<head>
+<title></title>
+<meta charset="utf-8">
+<link rel="stylesheet" href="./css/example.css">
+<link rel="stylesheet" href="./css/stroll.css">
+<link rel="stylesheet" href="./css/animate.css" />
+
+<script>
+
+function selectMonth( obj ) {
+    obj.setAttribute( "class", "animated rotateIn" );
+    window.parent.postMessage( obj.innerHTML ,"*");
+}
+
+window.addEventListener("message", function(e){
+  var chooser = document.getElementById("chooser");
+  var deletList = chooser.getElementsByTagName("li");
+  if ( deletList.length > 0 ) {
+    for ( var i = deletList.length - 1; i >= 0; i-- ) {
+      chooser.removeChild( deletList.item(i) );
+    }
+  }
+  var ym = e.data;
+  var effects = new Array( "curl", "curl", "curl", "curl", "twirl", "fly", "fan", "helix" );
+  var idx = parseInt( Math.random() * effects.length )
+  chooser.setAttribute( "class", effects[ idx ] );
+
+  var ymList = new Array();
+  var s = ym.split("/");
+  var y = s[0] - 1;
+  var m = s[1]
+
+  
+  for ( var i = 0; i < 25; i++ ) {
+    m++;
+    if ( m > 12 ) {
+      y++;
+      m = 1;
+    }
+    
+    var strYM = y + "/" + ( "0" + m ).substr(-2);
+    var newLi = document.createElement("li");
+    newLi.setAttribute("onClick","selectMonth(this)");
+    newLi.innerHTML = strYM;
+    chooser.appendChild( newLi );
+  }
+  stroll.bind( '#main ul' );
+
+}, false);
+
+
+
+function createChooser() {
+  
+
+}
+</script>
+
+</head>
+<body>
+<div id="main" >
+
+<ul id="chooser"class="curl" style="font-family: 'Calisto MT';font-weight:bold;">
+</ul>
+
+
+</div>
+
+<script src="./js/stroll.min.js"></script>
+<script>
+	stroll.bind( '#main ul' );
+</script>
+</body>
+</html>

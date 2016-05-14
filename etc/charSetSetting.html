@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>@HP自動化ツール</title>
+<link rel="shortcut icon" href="./favicon.ico"> 
+<meta charset="UTF-8" />
+<link rel="stylesheet" href="./css/header.css" />
+
+
+<link rel="stylesheet" href="./css/title.css" type="text/css" />
+<link rel="stylesheet" href="./css/button.css" type="text/css" />
+<link rel="stylesheet" href="./css/roundedTextBox.css" type="text/css" />
+<link rel="stylesheet" href="./css/pageCurl.css" type="text/css" />
+<link rel="stylesheet" href="./css/animate.css" />
+<style type="text/css">
+span.error {
+   color: red;
+  }
+ 
+div.error {
+   color: red;
+    -webkit-animation-name: 'rotate';
+	-webkit-animation-duration: 1s;
+	-webkit-animation-timing-function: ease;
+}
+
+
+div.shadow{
+  color:#fff;
+  padding:10px;
+  background:#ffc0cb;
+  -webkit-transition: 0.5s ease-in-out;
+  -moz-box-shadow: 10px 3px 15px #800000;
+  -webkit-box-shadow: 10px 3px 15px #800000;
+}
+
+  @-webkit-keyframes 'rotate' {
+    0% { -webkit-transform: rotate(0deg); }
+    33% { -webkit-transform: rotate(0.5deg); }
+    66% { -webkit-transform: rotate(-0.5deg); }
+    100% { -webkit-transform: rotate(0deg); }
+  }
+
+</style>
+
+
+<script src="./js/common.js"></script>
+<script src="./js/jquery-1.9.0.js"></script>
+<script src="./js/textualizer.js"></script>
+
+
+
+<script language="javascript" type="text/javascript">
+$(function() {
+    var list = [document.getElementById("headetTitleHidden").value]; // 目的のテキストを指定
+    var txt = $('#headerTitle'); // id名を指定
+    var options = {
+        duration: 10,
+        rearrangeDuration: 10,
+        effect: 'random',
+        centered: true
+    }
+ 
+    txt.textualizer(list, options);
+    txt.textualizer('start');
+});
+
+
+
+
+    currentSelect = "";
+
+    function lineAdd() {
+
+      var charSetString = 
+	"<select id='language' name='language' class='rounded'> " +
+	"<option value='UTF-8' selected>UTF-8</option> " +
+	"<option value='Shift_JIS'>Shift_JIS</option> " +
+	"<option value='EUC-JP'>EUC-JP</option> " +
+	"<option value='ISO-2022-JP'>ISO-2022-JP</option> " +
+	"<option value='ISO-8859-1'>ISO-8859-1</option> " +
+	"</select>";
+
+
+      var target = document.getElementById("lineLast");
+      var newElement = document.createElement("div"); 
+      newElement.setAttribute("name","changeMe");
+      newElement.innerHTML = "<div><span></span><input type='url' class='rounded' size='100' onBlur='saveUrl()' placeholder='urlを入力' required /> " 
+      + charSetString + "<a href='#' class='button delete'  onClick='return lineDel(this)'>削除</a></div>";
+      target.insertBefore(newElement, null);
+      saveUrl();
+      var changeTarget = document.getElementsByName("changeMe").item(0);
+      changeTarget.setAttribute("name","");
+      changeTarget.setAttribute("class","animated bounceInUp");
+      //renumber();
+    }
+
+
+    function lineDel(obj) {
+      var parentObj = obj.parentNode;
+      parentObj.setAttribute("class","animated bounceOutDown");
+      setTimeout( function(){  
+           parentObj.setAttribute("class","");
+           parentObj.parentNode.removeChild(obj.parentNode);
+           saveUrl();
+      }, 500 );
+
+    }
+
+
+    function renumber(errNumberList)  {
+      var i = 1;
+      //var urlList = document.getElementById("lineLast");
+      var urlNode = document.getElementById("lineLast").getElementsByTagName('div').item(0);
+      while(urlNode) {
+        i++;
+        urlNode.getElementsByTagName('span').item(0).innerHTML = toZeroPadding(i, 2);
+        if (errNumberList.join().match(i)) {
+           urlNode.getElementsByTagName('span').item(0).setAttribute("class","error");
+           urlNode.setAttribute("class","error");
+        } else {
+           urlNode.getElementsByTagName('span').item(0).setAttribute("class","");
+           urlNode.setAttribute("class","");
+        }
+
+
+        urlNode = urlNode.nextElementSibling;
+      }
+    }
+
+
+    function saveUrl() {
+      var urlList = new Array();
+      var errNumberList = new Array();
+      var i = 1;
+
+      var inputText = document.getElementById("urlFirst").value;
+      if (inputText) {
+          urlList.push(inputText);
+      } else {
+          errNumberList.push(i);
+      }
+
+      var urlNode = document.getElementById("lineLast").getElementsByTagName('div').item(0);
+      while(urlNode) {
+        var urlInputNodes = urlNode.getElementsByTagName('input');
+        
+        
+        var textValue = urlInputNodes.item(0).value.replace(/(^\s+)|(\s+$)/g, ""); //trim
+        if (textValue) {
+            i++;
+            if (!urlList.join().match(textValue)) { 
+              urlList.push(textValue);
+            } else {
+              errNumberList.push(i);
+            }
+         
+        }
+   
+        urlNode = urlNode.nextElementSibling;
+      }
+
+      document.getElementById("urlSave").value = urlList.join();
+      renumber(errNumberList);
+    }
+
+
+    function getUrlText() {
+       alert(document.getElementById("urlSave").value);
+
+    }
+
+    function showDetail(obj) {
+       var urltext = obj.parentNode.getElementsByTagName('input').item(0).value;
+
+       if (currentSelect) {
+          currentSelect.setAttribute("class","");
+       }
+       currentSelect = obj.parentNode;
+       currentSelect.setAttribute("class","shadow");
+
+    }
+
+function frmSubmit(){
+    document.frm.submit();
+}
+
+</script>
+
+
+</head>
+
+<body>
+<script src="./js/header.js"></script>
+
+
+<table border="0"><tr><td width="350px">
+<p class="title">文字コード設定</p></td>
+<td width="900px" align="center"><p id="headerTitle" class="pCurlDrop-shadow pCurlLifted">クロスランゲージ市役所(2013/02/15)</p></td>
+</tr></table>
+
+
+
+<form name="frm" action="./submit.cgi" method="POST">
+
+
+  <div>
+  <a href="#" class="button add"  onClick="return lineAdd()">追加</a>
+  <input class="button play" type="submit" value="実行"/><br /><br />
+  </div>
+  <div>
+    <span>01</span><input type="url" id="urlFirst" class="rounded" size='100' onBlur='saveUrl()' placeholder='urlを入力' required /> 
+    <select id="charSet" class="rounded">
+    <option value="UTF-8" selected>UTF-8</option>
+    <option value="Shift_JIS">Shift_JIS</option>
+    <option value="EUC-JP">EUC-JP</option>
+    <option value="ISO-2022-JP">ISO-2022-JP</option>
+    <option value="ISO-8859-1">ISO-8859-1</option>
+    </select>
+  </div>
+
+  <div id="lineLast"></div>
+
+  <input type="hidden" id="urlSave">
+
+
+</form>
+
+<input id="headetTitleHidden" type="hidden" value="クロスランゲージ区役所(2013/02/15)" />
+</body>
+</html>

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8" />
+
+<title></title>
+<script type="text/javascript" src="http://0-oo.googlecode.com/svn/pryn.js"></script>
+<script type="text/javascript" src="http://0-oo.googlecode.com/svn/gcalendar-holidays.js"></script>
+<script type="text/javascript">
+
+function get() {
+	var frm = $("frm");
+	//GCalHolidays.userId = "k1b51v9t41vn3k0agk648pr7p0@group.calendar.google.com";
+	GCalHolidays.get(show, "2013" , undefined);
+}
+
+holiday = new Array();
+
+function show(days) {
+
+  for (var i in days) {
+    var day = days[i];
+    holiday[day.year + "/" + day.month + "/" + day.date] = day.title;
+  }
+alert(holiday.length);
+}
+
+
+
+</script>
+</header>
+<body onLoad="get()">
+
+<div id="list"></div>
+
+</body>
+</html>

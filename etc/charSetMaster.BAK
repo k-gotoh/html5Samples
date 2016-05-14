@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>@HP自動化ツール</title>
+<link rel="shortcut icon" href="./favicon.ico"> 
+<meta charset="UTF-8" />
+
+<link rel="stylesheet" href="./css/header.css" />
+<link rel="stylesheet" href="./css/captionText.css" type="text/css" />
+<link rel="stylesheet" href="./css/roundedTextBox.css" type="text/css" />
+<link rel="stylesheet" href="./css/pageCtantosha.css" type="text/css" />
+<style type="text/css">
+span.error {
+   color: red;
+  }
+ 
+div.error {
+   color: red;
+    -webkit-animation-name: 'rotate';
+	-webkit-animation-duration: 1s;
+	-webkit-animation-timing-function: ease;
+}
+
+
+div.shadow{
+  color:#fff;
+  padding:10px;
+  background:#ffc0cb;
+  -webkit-transition: 0.5s ease-in-out;
+  -moz-box-shadow: 10px 3px 15px #800000;
+  -webkit-box-shadow: 10px 3px 15px #800000;
+}
+
+  @-webkit-keyframes 'rotate' {
+    0% { -webkit-transform: rotate(0deg); }
+    33% { -webkit-transform: rotate(0.5deg); }
+    66% { -webkit-transform: rotate(-0.5deg); }
+    100% { -webkit-transform: rotate(0deg); }
+  }
+}
+
+
+
+
+
+</style>
+<link rel="stylesheet" href="./css/button.css" type="text/css" />
+<link rel="stylesheet" href="./css/title.css" type="text/css" />
+<link rel="stylesheet" href="./css/animate.css" />
+
+<script src="./js/common.js"></script>
+<script language="javascript" type="text/javascript">
+
+    var insertHtml = "<span>01</span><input type='text' class='rounded' id='tantoshaFirst' size='30' onBlur='savetantosha()' placeholder='charSetを入力' required />　" +
+"    <a href='#' class='button delete'  onClick='return lineDel(this)'>削除</a>";
+
+    currentSelect = "";
+
+    function lineAdd() {
+      var target = document.getElementById("lineLast");
+      var newElement = document.createElement("div"); 
+      newElement.setAttribute("name","changeMe");
+      newElement.innerHTML = insertHtml;
+      target.insertBefore(newElement, null);
+      savetantosha();
+      var changeTarget = document.getElementsByName("changeMe").item(0);
+      changeTarget.setAttribute("name","");
+      changeTarget.setAttribute("class","animated rotateIn");
+      //renumber();
+    }
+
+
+    function lineDel(obj) {
+      var parentObj = obj.parentNode;
+      parentObj.setAttribute("class","animated rotateOut");
+      setTimeout( function(){  
+           parentObj.setAttribute("class","");
+           parentObj.parentNode.removeChild(obj.parentNode);
+           savetantosha();
+      }, 500 );
+
+
+      //renumber();
+
+    }
+
+
+    function renumber(errNumberList)  {
+      var i = 1;
+      //var tantoshaList = document.getElementById("lineLast");
+      var tantoshaNode = document.getElementById("lineLast").getElementsByTagName('div').item(0);
+      while(tantoshaNode) {
+        i++;
+        tantoshaNode.getElementsByTagName('span').item(0).innerHTML = toZeroPadding(i, 2);
+        if (errNumberList.join().match(i)) {
+           tantoshaNode.getElementsByTagName('span').item(0).setAttribute("class","error");
+           tantoshaNode.setAttribute("class","error");
+        } else {
+           tantoshaNode.getElementsByTagName('span').item(0).setAttribute("class","");
+           tantoshaNode.setAttribute("class","");
+        }
+
+
+        tantoshaNode = tantoshaNode.nextElementSibling;
+      }
+    }
+
+    function savetantosha() {
+      var tantoshaList = new Array();
+      var errNumberList = new Array();
+      var i = 1;
+
+      var inputText = document.getElementById("tantoshaFirst").value;
+      if (inputText) {
+          tantoshaList.push(inputText);
+      } else {
+          errNumberList.push(i);
+      }
+
+      var tantoshaNode = document.getElementById("lineLast").getElementsByTagName('div').item(0);
+      while(tantoshaNode) {
+        var tantoshaInputNodes = tantoshaNode.getElementsByTagName('input');
+        
+        
+        var textValue = tantoshaInputNodes.item(0).value.replace(/(^\s+)|(\s+$)/g, ""); //trim
+        if (textValue) {
+            i++;
+            if (!tantoshaList.join().match(textValue)) { 
+              tantoshaList.push(textValue);
+            } else {
+              errNumberList.push(i);
+            }
+         
+        }
+   
+        tantoshaNode = tantoshaNode.nextElementSibling;
+      }
+
+      document.getElementById("tantoshaSave").value = tantoshaList.join();
+      renumber(errNumberList);
+
+    }
+
+
+    function gettantoshaText() {
+       alert(document.getElementById("tantoshaSave").value);
+
+    }
+
+    function showDetail(obj) {
+       var tantoshatext = obj.parentNode.getElementsByTagName('input').item(0).value;
+
+       if (currentSelect) {
+          currentSelect.setAttribute("class","");
+       }
+       currentSelect = obj.parentNode;
+       currentSelect.setAttribute("class","shadow");
+
+    }
+
+
+function frmSubmit(){
+    document.frm.submit();
+}
+
+ </script>
+</head>
+<body>
+<script src="./js/settingHeader.js"></script>
+
+<table border="0"><tr><td width="350px">
+<p class="title"> 文字コード登録</p></td>
+</tr></table>
+
+
+<form name="frm" action="a" method="POST">
+
+
+  <div>
+  <a href="#" class="button add"  onClick="return lineAdd()">追加</a>
+  <a href="#" class="button play"  onClick="document.frm.submit()">保存</a>
+  <!--input class="button play" type="submit" value="保存"/><br /><br /-->
+  </div>
+  <div>
+    <span>01</span><input type="text" class="rounded" id="tantoshaFirst" size='30' onBlur='savetantosha()' placeholder='charSetを入力' required />　
+  </div>
+
+  <div id="lineLast"></div>
+
+  <input type="hidden" id="tantoshaSave"><br/>
+
+</form>
+</body>
+</html>

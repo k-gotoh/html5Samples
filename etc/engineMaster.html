@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>@HP自動化ツール</title>
+<link rel="shortcut icon" href="./favicon.ico"> 
+<meta charset="UTF-8" />
+
+<link rel="stylesheet" href="./css/header.css" />
+<link rel="stylesheet" href="./css/captionText.css" type="text/css" />
+<link rel="stylesheet" href="./css/roundedTextBox.css" type="text/css" />
+<link rel="stylesheet" href="./css/pageCengine.css" type="text/css" />
+<style type="text/css">
+span.error {
+   color: red;
+  }
+ 
+div.error {
+   color: red;
+    -webkit-animation-name: 'rotate';
+	-webkit-animation-duration: 1s;
+	-webkit-animation-timing-function: ease;
+}
+
+
+div.shadow{
+  color:#fff;
+  padding:10px;
+  background:#ffc0cb;
+  -webkit-transition: 0.5s ease-in-out;
+  -moz-box-shadow: 10px 3px 15px #800000;
+  -webkit-box-shadow: 10px 3px 15px #800000;
+}
+
+  @-webkit-keyframes 'rotate' {
+    0% { -webkit-transform: rotate(0deg); }
+    33% { -webkit-transform: rotate(0.5deg); }
+    66% { -webkit-transform: rotate(-0.5deg); }
+    100% { -webkit-transform: rotate(0deg); }
+  }
+}
+
+
+
+
+
+</style>
+<link rel="stylesheet" href="./css/button.css" type="text/css" />
+
+<link rel="stylesheet" href="./css/title.css" type="text/css" />
+<link rel="stylesheet" href="./css/animate.css" />
+
+<script type="text/javascript" src="./js/common.js"></script>
+
+<script language="javascript" type="text/javascript">
+
+    var insertHtml = "    <span>01</span><input type='text' class='rounded' id='eidFirst' size='10' onBlur='saveengine()' placeholder='EIDを入力' required />　" +
+" <input type='text' class='rounded' id='eNameFirst' size='50' onBlur='saveengine()' placeholder='名称を入力' required />" +
+"<a href='#' class='button delete'  onClick='return lineDel(this)'>削除</a>";
+
+    currentSelect = "";
+
+    function lineAdd() {
+      var target = document.getElementById("lineLast");
+      var newElement = document.createElement("div"); 
+      newElement.setAttribute("name","changeMe");
+      newElement.innerHTML = insertHtml;
+      target.insertBefore(newElement, null);
+      saveengine();
+      var changeTarget = document.getElementsByName("changeMe").item(0);
+      changeTarget.setAttribute("name","");
+      changeTarget.setAttribute("class","animated fadeInDown");
+      //renumber();
+    }
+
+
+    function lineDel(obj) {
+      var parentObj = obj.parentNode;
+      parentObj.setAttribute("class","animated fadeOutUp");
+      setTimeout( function(){  
+           parentObj.setAttribute("class","");
+           parentObj.parentNode.removeChild(obj.parentNode);
+           saveengine();
+      }, 500 );
+
+
+      //renumber();
+
+    }
+
+
+    function renumber(errNumberList)  {
+      var i = 1;
+      //var engineList = document.getElementById("lineLast");
+      var engineNode = document.getElementById("lineLast").getElementsByTagName('div').item(0);
+      while(engineNode) {
+        i++;
+        engineNode.getElementsByTagName('span').item(0).innerHTML = toZeroPadding(i, 2);
+        if (errNumberList.join().match(i)) {
+           engineNode.getElementsByTagName('span').item(0).setAttribute("class","error");
+           engineNode.setAttribute("class","error");
+        } else {
+           engineNode.getElementsByTagName('span').item(0).setAttribute("class","");
+           engineNode.setAttribute("class","");
+        }
+
+
+        engineNode = engineNode.nextElementSibling;
+      }
+    }
+
+    function saveengine() {
+      var engineList = new Array();
+      var errNumberList = new Array();
+      var i = 1;
+
+      var inputText = document.getElementById("eidFirst").value;
+      if (inputText) {
+          engineList.push(inputText);
+      } else {
+          errNumberList.push(i);
+      }
+
+      var engineNode = document.getElementById("lineLast").getElementsByTagName('div').item(0);
+      while(engineNode) {
+        var engineInputNodes = engineNode.getElementsByTagName('input');
+        
+        
+        var textValue = engineInputNodes.item(0).value.replace(/(^\s+)|(\s+$)/g, ""); //trim
+        if (textValue) {
+            i++;
+            if (!engineList.join().match(textValue)) { 
+              engineList.push(textValue);
+            } else {
+              errNumberList.push(i);
+            }
+         
+        }
+   
+        engineNode = engineNode.nextElementSibling;
+      }
+
+      document.getElementById("engineSave").value = engineList.join();
+      renumber(errNumberList);
+
+    }
+
+
+    function getengineText() {
+       alert(document.getElementById("engineSave").value);
+
+    }
+
+    function showDetail(obj) {
+       var enginetext = obj.parentNode.getElementsByTagName('input').item(0).value;
+
+       if (currentSelect) {
+          currentSelect.setAttribute("class","");
+       }
+       currentSelect = obj.parentNode;
+       currentSelect.setAttribute("class","shadow");
+
+    }
+
+
+function frmSubmit(){
+    document.frm.submit();
+}
+
+ </script>
+</head>
+<body>
+<script src="./js/settingHeader.js"></script>
+
+<table border="0"><tr><td width="350px">
+<p class="title"> エンジン登録</p></td>
+</tr></table>
+
+
+<form name="frm" action="a" method="POST">
+
+
+  <div>
+  <a href="#" class="button add"  onClick="return lineAdd()">追加</a>
+  <a href="#" class="button play"  onClick="document.frm.submit()">保存</a>
+  <!--input class="button play" type="submit" value="保存"/><br /><br /-->
+  </div>
+  <div>
+    <span>01</span><input type='text' class='rounded' id='eidFirst' size='10' onBlur='saveengine()' placeholder='EIDを入力' required />　
+    <input type='text' class='rounded' id="eNameFirst" size='50' onBlur='saveengine()' placeholder='名称を入力' required />
+  </div>
+
+  <div id="lineLast"></div>
+
+  <input type="hidden" id="engineSave"><br/>
+
+</form>
+</body>
+</html>

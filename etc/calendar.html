@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta charset="utf-8" />
+<title>@HP自動化ツール</title>
+<link rel="shortcut icon" href="./favicon.ico"> 
+<link rel="stylesheet" href="./css/header.css" />
+<link rel="stylesheet" type="text/css" href="./css/calendar.css"/>
+<link rel="stylesheet" href="./css/title.css" type="text/css" />
+<link rel="stylesheet" href="./css/animate.css" />
+
+
+
+<style>
+li.sat {
+  color:blue; }
+
+li.sun {
+  color:red; }
+
+
+li.holiday {
+  color:red; }
+
+li.today {
+  border-style:dotted;
+  border-color:#77f;
+  border-width: 2px;
+  margin:0px;
+  -moz-border-radius: 4px;
+  -webkit-border-radius: 4px; }
+
+.custName {
+  border-style: dotted;
+  border-width: 1px;
+  border-color: #cccccc;
+  background-color:#87cefa;
+  color:#444444;
+  font-size:0.7em;
+  text-align: center;
+  padding : 1px 0px 0px 0px;
+  margin:2px;
+  -moz-border-radius: 4px;
+  -webkit-border-radius: 4px;
+  box-shadow: 0px 2px 2px #000000; }
+
+
+.dropBoxLeft { 
+  background-color: transparent;
+  position: absolute; 
+  width:250px;
+  height:650px;
+  border-width: 0px;
+  border-color:#ccc;
+  border-style: dotted;
+  top:40px;
+  left: -200px;
+  -moz-border-radius: 4px;
+  -webkit-border-radius: 4px; }
+
+.dropBoxRight { 
+
+  position: absolute; 
+  width:250px;
+  height:650px;
+  border-width: 0px;
+  border-color:red;
+  border-style: solid;
+  top:-190px;
+  left:30px;
+  -moz-border-radius: 4px;
+  -webkit-border-radius: 4px; }
+
+.block {
+  display:block;
+}
+
+.invisible {
+  visibility:hidden; }
+
+.collapse {
+ visibility:collapse; }
+
+.arrowText {
+  font-size:180px;
+  color:rgba(200,200,200,0.5);
+  position:absolute;
+  left:270px;
+  top:300px;
+  padding: 10px;  }
+
+
+</style>
+
+
+
+<script type="text/javascript" src="http://0-oo.googlecode.com/svn/pryn.js"></script>
+<script type="text/javascript" src="http://0-oo.googlecode.com/svn/gcalendar-holidays.js"></script>
+
+
+<script>
+
+currentYMTop = "";
+holiday = new Array();
+currentYear = "2000";
+
+
+function getHoliday(year) {
+	GCalHolidays.get(show, year , undefined);
+}
+
+
+function show(days) {
+
+  for (var i in days) {
+    var day = days[i];
+    var idx = day.year + "/" + day.month + "/" + day.date;
+    holiday[ idx ] = day.title;
+    if ( idx.substring(0,7) == currentYMTop.substring(0,7) ) {
+    // var s = currentYMTop.split("/");
+     var target = document.getElementById("d" + day.date);
+     target.setAttribute("class", target.getAttribute("class") + " holiday");
+     var newP = document.createElement("p");
+     newP.innerHTML = holiday[idx];
+
+     var liList = target.getElementsByTagName("lo");
+     if ( liList.length == 0) {
+       target.appendChild( newP, null);
+     } else {
+       target.insertBefore( newP, liList.item(0));
+     }
+
+   }
+  }
+}
+
+function monthChoose( obj ) {
+
+
+
+  var iFrameTag = document.getElementById("monthChooser");
+  iFrameTag.setAttribute("style","position:absolute;left:5px;top:55px;z-index:3");
+  iFrameTag.setAttribute("width","250px");
+  iFrameTag.setAttribute("height","380px");
+  iFrameTag.setAttribute("class","animated bounceIn");
+
+
+  window.frames[0].postMessage( obj.innerHTML , "*" );
+
+}
+
+window.addEventListener("message", function(e){
+  hideChooser();
+  backupUserTag();
+  currentYMTop = e.data + "/01";
+  createCalendar( e.data );
+  document.getElementById("calendarTop").setAttribute( "class", "calendar animated bounceInDown" );
+  setTimeout( function() {
+    document.getElementById("calendarTop").setAttribute( "class", "calendar" );
+  }, 800);
+
+}, false);
+
+function hideChooser() {
+
+
+  var iFrameTag = document.getElementById("monthChooser");
+  iFrameTag.setAttribute("style","position:absolute;left:5px;top:55px;z-index:1");
+  iFrameTag.setAttribute("class","animated bounceOut");
+  setTimeout( function() {
+    iFrameTag.setAttribute("width","1px");
+    iFrameTag.setAttribute("height","1px");
+  },800);
+
+}
+
+function lastMonth() {
+  backupUserTag();
+
+  document.getElementById("scroll").play();
+  var d = new Date( currentYMTop );
+  d.setDate(d.getDate() - 1);
+
+  var cal = document.getElementById("calendarTop");
+  var arrow = document.getElementById("rightArrow");
+  var arrowText = document.getElementById("arrowText")
+  document.getElementById("arrowText").innerHTML = d.getFullYear() + "/" + ( d.getMonth() + 1 );
+
+  setTimeout( function() {
+    arrow.setAttribute("class","animated fadeIn");
+    cal.setAttribute("class","calendar animated bounceInLeft");
+    arrowText.setAttribute("class","arrowText animated fadeIn");
+  }, 10);
+  setTimeout( function() {
+    arrow.setAttribute("class","invisible");
+    cal.setAttribute("class","calendar");
+    arrowText.setAttribute("class","invisible");
+  }, 1100);
+
+
+  createCalendar(d.getFullYear() + "/" + ( d.getMonth() + 1 ));
+  currentYMTop = d.getFullYear() + "/" + ( d.getMonth() + 1 ) + "/01";
+
+
+
+}
+
+
+
+function nextMonth() {
+  backupUserTag();
+
+  document.getElementById("scroll").play();
+  var d = new Date( currentYMTop );
+  d.setDate(d.getDate() + 31);
+
+  var cal = document.getElementById("calendarTop");
+  var arrow = document.getElementById("leftArrow");
+  var arrowText = document.getElementById("arrowText")
+  document.getElementById("arrowText").innerHTML = d.getFullYear() + "/" + ( d.getMonth() + 1 );
+
+
+  arrow.setAttribute("class","animated fadeIn");
+  cal.setAttribute("class","calendar animated bounceInRight");
+  arrowText.setAttribute("class","arrowText animated fadeIn");
+
+
+  setTimeout( function() {
+    arrow.setAttribute("class","invisible");
+    cal.setAttribute("class","calendar");
+    arrowText.setAttribute("class","invisible");
+  }, 1100);
+
+
+  createCalendar(d.getFullYear() + "/" + ( d.getMonth() + 1 ));
+  currentYMTop = d.getFullYear() + "/" + ( d.getMonth() + 1 ) + "/01";
+}
+
+
+
+
+function backupUserTag() {
+  var bkup = document.getElementById("backup");
+  var bkList = document.getElementById("thismonth").getElementsByClassName("custName");
+
+  for ( var i = bkList.length - 1; i >= 0; i-- ) {
+    bkup.appendChild(bkList.item(i));
+  }
+  
+}
+
+movableFlg = true;
+MOVE_INTERVAL = 2000;
+
+function lastMonthHover() {
+
+  if ( !movableFlg ) {
+    return;
+  }
+
+
+  movableFlg = false;
+  lastMonth();
+  
+  setTimeout( function() {
+    movableFlg = true;
+  }, MOVE_INTERVAL);
+}
+
+function nextMonthHover() {
+
+  if ( !movableFlg ) {
+    return;
+  }
+  movableFlg = false;
+  nextMonth();
+  
+  setTimeout( function() {
+    movableFlg = true;
+  }, MOVE_INTERVAL);
+}
+
+function hoverClear() {
+  movableFlg = false;
+}
+
+
+
+function createCalendar(ym){
+
+  var week = new Array ("sun","mon","tue","wed","thu","fri","sat");
+  //var mTitleArray = new Array ("January","February","March ","April","May","June","July","August","September","October","November","December");
+  var mTitleArray = new Array ("01","02","03","04","05","06","07","08","09","10","11","12");
+   var newUlElement;
+   var newLiElement
+   var targetElement;
+   var calcDate;
+
+   var lastmonth = document.getElementById("lastmonth");
+   var thismonth = document.getElementById("thismonth");
+   var nextmonth = document.getElementById("nextmonth");
+   lastmonth.removeChild(lastmonth.getElementsByTagName("ul").item(0));
+   thismonth.removeChild(thismonth.getElementsByTagName("ul").item(0));
+   nextmonth.removeChild(nextmonth.getElementsByTagName("ul").item(0));
+
+   //先月
+   var topDate = new Date(ym + "/01");
+   mTitle = mTitleArray[topDate.getMonth()];
+   document.getElementById("mTitle").innerHTML = topDate.getFullYear() + "/" + mTitle;
+
+   newUlElement = document.createElement("ul")
+   lastmonth.appendChild( newUlElement );
+   targetElement = lastmonth.getElementsByTagName("ul").item(0);
+
+   var day = topDate.getDay();
+   if ( day != 0 ) {
+
+     
+     for ( i = day; i > 0; i-- ) {
+       calcDate = new Date(ym + "/01");
+       calcDate.setDate( topDate.getDate() - i);
+       newLiElement = document.createElement("li")
+       newLiElement.innerHTML = calcDate.getDate();
+       targetElement.appendChild( newLiElement );
+
+     }
+   }
+
+   //今月
+   if ( topDate.getFullYear() != currentYear ) {
+     currentYear = topDate.getFullYear();
+     getHoliday(currentYear);
+
+   }
+   var backupList = document.getElementById("backup").getElementsByTagName("li");
+
+   newUlElement = document.createElement("ul")
+   thismonth.appendChild( newUlElement );
+   targetElement = thismonth.getElementsByTagName("ul").item(0);
+
+   var ym = topDate.getFullYear() + "/" + (topDate.getMonth() + 1) + "/"
+   var loopFlg = true;
+   var thisMM = topDate.getMonth();
+   do {
+
+     var checkDate = topDate.getFullYear() + "/" + (topDate.getMonth() + 1) + "/" + topDate.getDate();
+
+     newLiElement = document.createElement("li");
+     newLiElement.setAttribute("id","d" + topDate.getDate());
+
+     newLiElement.setAttribute("onDragStart","f_dragstart(event)");
+     newLiElement.setAttribute("onDragOver","calendarOver(event)");
+     newLiElement.setAttribute("onDrop","calendarDrop(this)");
+     newLiElement.setAttribute("title",ym + topDate.getDate());
+
+     newLiElement.innerHTML = topDate.getDate();
+     if ( checkDate in holiday) {
+       newLiElement.setAttribute("class", week[topDate.getDay()] + " holiday");
+       var newP = document.createElement("p");
+       newP.innerHTML = holiday[checkDate];
+       newLiElement.appendChild(newP);
+     } else {
+       newLiElement.setAttribute("class", week[topDate.getDay()]);
+     }
+     targetElement.appendChild( newLiElement );
+
+
+
+     if ( backupList.length > 0 ) {
+      
+       for ( var i = backupList.length - 1; i >= 0; i-- ) {
+         if (backupList.item(i).getAttribute("title") == checkDate) {
+           var olList = newLiElement.getElementsByTagName("ol");
+           if ( olList.length == 0 ) {
+             var newOlement = document.createElement("ol"); 
+             newLiElement.insertBefore(newOlement, null);
+           }
+           var olList = newLiElement.getElementsByTagName("ol");
+           olList.item(0).insertBefore(backupList.item(i), null);
+         }
+       }
+     }
+
+     topDate.setDate(topDate.getDate() + 1);
+
+     if (thisMM != topDate.getMonth()) {
+         loopFlg = false;
+     }
+     
+
+   } while(loopFlg);
+
+   //来月
+   newUlElement = document.createElement("ul");
+   nextmonth.appendChild( newUlElement );
+   targetElement = nextmonth.getElementsByTagName("ul").item(0);
+   if ( topDate.getDay() != 0 ) {
+
+     for ( i = topDate.getDay(); i <= 6 ; i++ ) {
+       newLiElement = document.createElement("li");
+       newLiElement.innerHTML = topDate.getDate();
+       targetElement.appendChild( newLiElement );
+
+       topDate.setDate( topDate.getDate() + 1);
+     } 
+   }
+
+   //今日は含まれるか？
+   var today = new Date();
+   var todayYm = today.getFullYear() + "/" + (today.getMonth() + 1) + "/";
+   if (todayYm == ym) {
+     document.getElementById( "d" + today.getDate() ).setAttribute("class", "today animated bounceInDown");
+   }
+   
+}
+
+
+function debugSet(){
+ var d = new Date();
+ d.setDate(d.getDate() + 2);
+ var today = d.getFullYear()+"/"+(d.getMonth() + 1)+"/"+d.getDate();
+ var o = document.getElementById("debug");
+ var list = o.getElementsByTagName("li");
+ var l=list.length;
+ for (i=0; i < l; i++) {
+   list.item(i).setAttribute("title",today);
+ }
+
+//  document.getElementById("debug").parentNodo.removeChild(document.getElementById("debug"));
+
+}
+
+function init() {
+
+  debugSet();
+
+  var d = new Date();
+  currentYMTop = d.getFullYear() + "/" + ( d.getMonth() + 1 ) + "/01";
+
+  createCalendar(d.getFullYear() + "/" + ( d.getMonth() + 1 ) );
+
+
+
+  setTimeout( function() {
+    document.getElementById("fall").play();
+  }, 500);
+  var today = new Date().getDate();
+  var todayLi = document.getElementById( "d" + today );
+  todayLi.setAttribute("class", todayLi.getAttribute("class") + " today animated bounceInDown");
+}
+
+function f_dragstart(event){
+  //ドラッグするデータのid名をDataTransferオブジェクトにセット
+  event.dataTransfer.setData("savaData", event.target.id);
+}
+
+function calendarOver(event) {
+  event.preventDefault();
+}
+
+
+function calendarDrop(obj){
+  document.getElementById("settingSound").play();
+
+  //ドラッグされたデータのid名をDataTransferオブジェクトから取得
+  var id_name = event.dataTransfer.getData("savaData");
+  //id名からドラッグされた要素を取得
+  var drag_elm =document.getElementById(id_name);
+
+  var olList = obj.getElementsByTagName("ol");
+  if ( olList.length == 0 ) {
+     var newElement = document.createElement("ol"); 
+     obj.insertBefore(newElement, null);
+  }
+
+  var newLiElement = document.createElement("li"); 
+  newLiElement.setAttribute("draggable", "true");
+  newLiElement.setAttribute("class", "custName");
+  newLiElement.setAttribute("id", id_name);
+  newLiElement.setAttribute("title", obj.getAttribute("title"));
+   newLiElement.setAttribute("onClick", "selectUser(this)");
+
+  newLiElement.innerHTML = drag_elm.innerHTML;
+
+ drag_elm.parentNode.removeChild(drag_elm);
+// olList.item(0).insertBefore(newLiElement, null);
+olList.item(0).appendChild(newLiElement);
+
+}
+
+
+function selectUser(obj) {
+  var clientId = obj.getAttribute("id");
+  obj.parentNode.parentNode.setAttribute("class","custName animated fadeOutUpBig");
+  document.getElementById("calendarTop").setAttribute("class","calendar animated flipOutY");
+  setTimeout( function() {
+    location.href = "./basicSetting.html"
+  }, 800);
+}
+
+/*
+  $(function() {
+    $( "#dialog" ).dialog({
+      autoOpen: false,
+      show: {
+        effect: "explode",
+        duration: 1000
+      },
+      hide: {
+        effect: "explode",
+        duration: 1000
+      }
+    });
+ 
+    $( "#opener" ).click(function() {
+      $( "#dialog" ).dialog( "open" );
+    });
+  });
+
+*/
+
+</script>
+
+</head>
+
+<body onLoad="init()">
+<script src="./js/settingHeader.js"></script>
+
+
+
+<p class="title" onClick="lastMonth()" style="z-index:2">&larr;</p>
+<p class="title" id="mTitle" width="300px" onClick="monthChoose(this)" style="z-index:2"></p>
+<p class="title" onClick="nextMonth()" style="z-index:2" >&rarr;</p>
+
+
+
+<div style="position:relative">
+<span  id="rightArrow"  class="invisible" style="position:absolute;left:-100px;top:250px;">
+<img src="./images/right.png" style="float:left;" /><br /></span>
+<div id="dropBoxLeft" class="dropBoxLeft" onClick="lastMonth()" onDragOver="lastMonthHover()" onDragLeave="hoverClear()"  style="z-index:2">
+</div>
+
+<!--div id="a1" class="dropBox rounded" id="test1" onDragStart="f_dragstart(event)" onDragOver="calendarOver(event)" onDrop="calendarDrop(this)" title="dropBox">
+</div-->
+
+  <ol id="calendarTop" class="calendar" start="0">
+    <li id="lastmonth">
+      <ul start="24">
+        <li>24</li>
+        <li>25</li>
+        <li>26</li>
+        <li>27</li>
+        <li>28</li>
+     </ul>
+    </li>
+
+    <li id="thismonth">
+
+     <ul>
+       <li id="d1" class="fri" onDragStart="f_dragstart(event)"  onDragOver="calendarOver(event)" onDrop="calendarDrop(this)" >1</li>
+       <li id="d2" class="sat" onDragStart="f_dragstart(event)"  onDragOver="calendarOver(event)" onDrop="calendarDrop(this)">2</li>
+
+
+       <li id="d3" class="sun" onDragStart="f_dragstart(event)"  onDragOver="calendarOver(event)" onDrop="calendarDrop(this)">3</li>
+       <li id="d4" class="mon" onDragStart="f_dragstart(event)"  onDragOver="calendarOver(event)" onDrop="calendarDrop(this)">4 </li>
+       <li id="d5" class="tue" onDragStart="f_dragstart(event)"  onDragOver="calendarOver(event)" onDrop="calendarDrop(this)">5</li>
+       <li id="d6" class="wed" onDragStart="f_dragstart(event)"  onDragOver="calendarOver(event)" onDrop="calendarDrop(this)">6</li>
+       <li id="d7" class="thu" onDragStart="f_dragstart(event)"  onDragOver="calendarOver(event)" onDrop="calendarDrop(this)">7</li>
+       <li id="d8" class="fri" onDragStart="f_dragstart(event)"  onDragOver="calendarOver(event)" onDrop="calendarDrop(this)">8</li>
+       <li id="d9" class="sat" onDragStart="f_dragstart(event)"  onDragOver="calendarOver(event)" onDrop="calendarDrop(this)">9 </li>
+
+
+       <li id="d10" class="sun" onDragStart="f_dragstart(event)"  onDragOver="calendarOver(event)" onDrop="calendarDrop(this)">10</li>
+       <li id="d11" class="mon" onDragStart="f_dragstart(event)"  onDragOver="calendarOver(event)" onDrop="calendarDrop(this)">11 </li>
+       <li id="d12" class="tue" onDragStart="f_dragstart(event)"  onDragOver="calendarOver(event)" onDrop="calendarDrop(this)">12</li>
+       <li id="d13" class="wed" onDragStart="f_dragstart(event)"  onDragOver="calendarOver(event)" onDrop="calendarDrop(this)">13</li>
+       <li id="d14" class="thu" onDragStart="f_dragstart(event)"  onDragOver="calendarOver(event)" onDrop="calendarDrop(this)">14</li>
+       <li id="d15" class="fri" onDragStart="f_dragstart(event)"  onDragOver="calendarOver(event)" onDrop="calendarDrop(this)">15</li>
+       <li id="d16" class="sat" onDragStart="f_dragstart(event)"  onDragOver="calendarOver(event)" onDrop="calendarDrop(this)">16 </li>
+
+       <li id="d17" class="sun" onDragStart="f_dragstart(event)"  onDragOver="calendarOver(event)" onDrop="calendarDrop(this)">17</li>
+       <li id="d18" class="mon" onDragStart="f_dragstart(event)"  onDragOver="calendarOver(event)" onDrop="calendarDrop(this)">18 </li>
+       <li id="d19" class="tue" onDragStart="f_dragstart(event)"  onDragOver="calendarOver(event)" onDrop="calendarDrop(this)">19</li>
+       <li id="d20" class="wed holiday" onDragStart="f_dragstart(event)"  onDragOver="calendarOver(event)" onDrop="calendarDrop(this)">20</li>
+       <li id="d21" class="thu" onDragStart="f_dragstart(event)"  onDragOver="calendarOver(event)" onDrop="calendarDrop(this)">21</li>
+       <li id="d22" class="fri" onDragStart="f_dragstart(event)"  onDragOver="calendarOver(event)" onDrop="calendarDrop(this)">22</li>
+       <li id="d23" class="sat" onDragStart="f_dragstart(event)"  onDragOver="calendarOver(event)" onDrop="calendarDrop(this)">23 </li>
+
+
+       <li id="d24" class="sun" onDragStart="f_dragstart(event)"  onDragOver="calendarOver(event)" onDrop="calendarDrop(this)">24</li>
+       <li id="d25" class="mon" onDragStart="f_dragstart(event)"  onDragOver="calendarOver(event)" onDrop="calendarDrop(this)">25</li>
+       <li id="d26" class="tue" onDragStart="f_dragstart(event)"  onDragOver="calendarOver(event)" onDrop="calendarDrop(this)">26</li>
+       <li id="d27" class="wed" onDragStart="f_dragstart(event)"  onDragOver="calendarOver(event)" onDrop="calendarDrop(this)">27</li>
+       <li id="d28" class="thu" onDragStart="f_dragstart(event)"  onDragOver="calendarOver(event)" onDrop="calendarDrop(this)">28</li>
+       <li id="d29" class="fri" onDragStart="f_dragstart(event)"  onDragOver="calendarOver(event)" onDrop="calendarDrop(this)">29</li>
+       <li id="d30" class="sat" onDragStart="f_dragstart(event)"  onDragOver="calendarOver(event)" onDrop="calendarDrop(this)">30</li>
+
+       <li id="d31" class="sun" onDragStart="f_dragstart(event)"  onDragOver="calendarOver(event)" onDrop="calendarDrop(this)">24</li>
+     </ul>
+   </li>
+		
+   <li id="nextmonth">
+
+      <ul>
+       <li>1</li>
+       <li>2</li>
+       <li>3</li>
+       <li>4</li>
+       <li>5</li>
+       <li>6</li>
+     </ul>
+   </li>
+ </ol>
+
+<span  id="leftArrow"  class="invisible" style="position:absolute;left:100px;top:30px;">
+<img src="./images/left.png" style="float:left;" /><br /></span>
+
+<div class="dropBoxRight" onClick="nextMonth()"  onDragOver="nextMonthHover()" onDragLeave="hoverClear()"></div>
+<!--div id="a1" class="dropBox rounded" id="test1" onDragStart="f_dragstart(event)" onDragOver="calendarOver(event)" onDrop="calendarDrop(this)" title="dropBox">
+</div-->
+</div>
+
+<span  id="arrowText"class="invisible"></span>
+
+
+
+
+
+<div id="backup" style="visibility:hidden">
+<ol id="debug">
+
+<li id="id1" class="custName" draggable="true" title="" onClick="selectUser(this)">お客様１</li>
+<li id="id2" class="custName" draggable="true" title="" onClick="selectUser(this)" >お客様2</li>
+<li id="id3" class="custName" draggable="true" title="" onClick="selectUser(this)" >お客様3</li>
+<li id="id4" class="custName" draggable="true" title="" onClick="selectUser(this)" >ああああああああああああああお客様4</li>
+<li id="id5" class="custName" draggable="true" title="" onClick="selectUser(this)" >お客様5</li>
+</ol>
+</div>
+
+
+
+
+<iframe  src="./monthChooser.html" id="monthChooser" name="userListAnser" frameborder="0" width="1px" height="1px" style="position:absolute;left:5px;top:55px;z-index:1" onMouseOut="hideChooser();"></iframe>
+
+<audio id="settingSound" preload="auto">
+<source src="./SE/settingDate.mp3" type="audio/mp3"/>
+</audio>
+
+<audio id="fall" preload="auto">
+<source src="./SE/0021.mp3" type="audio/mp3"/>
+</audio>
+
+<audio id="scroll" preload="auto">
+<source src="./SE/scroll.mp3" type="audio/mp3"/>
+</audio>
+
+
+</body>
+</html>

@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8" />
+
+
+<link rel="stylesheet" href="./css/roundedTextBox.css" type="text/css" />
+<link rel="stylesheet" href="./css/checkBoxGroup.css" type="text/css" />
+
+<style type="text/css">
+table {
+    *border-collapse: collapse; /* IE7 and lower */
+    border-spacing: 0;
+    width: 100%;    
+}
+
+.bordered {
+    border: solid #ccc 1px;
+    -moz-border-radius: 6px;
+    -webkit-border-radius: 6px;
+    border-radius: 6px;
+    -webkit-box-shadow: 0 1px 1px #ccc; 
+    -moz-box-shadow: 0 1px 1px #ccc; 
+    box-shadow: 0 1px 1px #ccc;         
+}
+
+.bordered tr:hover {
+    background: #fbf8e9;
+    -o-transition: all 0.1s ease-in-out;
+    -webkit-transition: all 0.1s ease-in-out;
+    -moz-transition: all 0.1s ease-in-out;
+    -ms-transition: all 0.1s ease-in-out;
+    transition: all 0.1s ease-in-out;     
+}    
+    
+.bordered td, .bordered th {
+    border-left: 1px solid #ccc;
+    border-top: 1px solid #ccc;
+    padding: 10px;
+    text-align: left;    
+}
+
+.bordered th {
+    background-color: #dce9f9;
+    background-image: -webkit-gradient(linear, left top, left bottom, from(#ebf3fc), to(#dce9f9));
+    background-image: -webkit-linear-gradient(top, #ebf3fc, #dce9f9);
+    background-image:    -moz-linear-gradient(top, #ebf3fc, #dce9f9);
+    background-image:     -ms-linear-gradient(top, #ebf3fc, #dce9f9);
+    background-image:      -o-linear-gradient(top, #ebf3fc, #dce9f9);
+    background-image:         linear-gradient(top, #ebf3fc, #dce9f9);
+    -webkit-box-shadow: 0 1px 0 rgba(255,255,255,.8) inset; 
+    -moz-box-shadow:0 1px 0 rgba(255,255,255,.8) inset;  
+    box-shadow: 0 1px 0 rgba(255,255,255,.8) inset;        
+    border-top: none;
+    text-shadow: 0 1px 0 rgba(255,255,255,.5); 
+}
+
+.bordered td:first-child, .bordered th:first-child {
+    border-left: none;
+}
+
+.bordered th:first-child {
+    -moz-border-radius: 6px 0 0 0;
+    -webkit-border-radius: 6px 0 0 0;
+    border-radius: 6px 0 0 0;
+}
+
+.bordered th:last-child {
+    -moz-border-radius: 0 6px 0 0;
+    -webkit-border-radius: 0 6px 0 0;
+    border-radius: 0 6px 0 0;
+}
+
+.bordered th:only-child{
+    -moz-border-radius: 6px 6px 0 0;
+    -webkit-border-radius: 6px 6px 0 0;
+    border-radius: 6px 6px 0 0;
+}
+
+.bordered tr:last-child td:first-child {
+    -moz-border-radius: 0 0 0 6px;
+    -webkit-border-radius: 0 0 0 6px;
+    border-radius: 0 0 0 6px;
+}
+
+.bordered tr:last-child td:last-child {
+    -moz-border-radius: 0 0 6px 0;
+    -webkit-border-radius: 0 0 6px 0;
+    border-radius: 0 0 6px 0;
+}
+
+/* ヘッダー固定 
+.fTable { border:solid 1px; }
+.fTableHeader { float:left; }
+.fTableBody { float:left; height:600px; overflow:auto; }
+ */
+
+</style>
+
+<link rel="stylesheet" href="./css/button.css" type="text/css" />
+<link rel="stylesheet" href="./css/captionText.css" type="text/css" />
+<link rel="stylesheet" href="./css/animate.css" />
+
+<!-- 0パディング等-->
+<script type="text/javascript" src="./js/common.js"></script>
+<script type="text/javascript" src="./js/jquery.min.js"></script>
+
+<script language="javascript" type="text/javascript">
+
+tdClickedFlg = false;
+cbxClickedFlg = false;
+
+ function showDetails(obj) {
+  if ( tdClickedFlg ) {
+    tdClickedFlg = false;
+    cbxClickedFlg = false;
+    return;
+  }
+
+   var tdList = (obj.getElementsByTagName("td"));
+
+   for ( i = 0; i < tdList.length; i++ ) {
+     if ( tdList.item(i).getAttribute("name") == "userCode" ) {
+       //alert(tdList.item(i).innerHTML);
+       var userCode = tdList.item(i).innerHTML;
+       
+       //parentへXDMで送信
+       window.parent.postMessage( userCode, "*" );
+       break;
+     }
+   }
+
+ }
+
+
+ function createSettingFiles() {
+   var cbxList = document.getElementsByName("selUserCbx");
+   var selectedList = new Array();
+   for ( i = 0; i < cbxList.length; i++ ) {
+     if ( cbxList.item(i).checked ) {
+      var tdList = cbxList.item(i).parentNode.parentNode.getElementsByTagName("td");
+      if ( tdList.item(i).getAttribute("name") == "userCode" ) {
+        selectedList.push(tdList.item(i).innerHTML);
+        break;
+      }
+     }
+   }
+
+
+ }
+
+window.addEventListener("message", function(e){
+  createSettingFiles();
+}, false);
+
+
+function cbxClicked(obj) {
+  cbxClickedFlg = true;
+
+  if ( obj.checked ) {
+   // obj.parentNode.setAttribute("class","animated flip");
+    obj.parentNode.parentNode.setAttribute("class","");
+
+  } else {
+    //obj.parentNode.setAttribute("class","");
+    obj.parentNode.parentNode.setAttribute("class","animated wiggle");
+  }
+
+  var tdLists = obj.parentNode.parentNode.getElementsByTagName("td");
+  for ( var i = 1; i < tdLists.length; i = i + 2 ) {
+    if ( obj.checked ) {
+      tdLists.item(i).setAttribute("class","animated flip");
+    } else {
+      tdLists.item(i).setAttribute("class","");
+    }
+    
+  }
+
+  var msg = " Not selected.";
+  var cbxList = document.getElementsByName("selUserCbx");
+  var cnt = 0;
+  for ( i = 0; i < cbxList.length; i++ ) { 
+    if ( cbxList.item(i).checked ) {
+      cnt++;
+    }
+  }
+  if ( cnt != 0 ) {
+    msg = " " + cnt + " checked.";
+    window.parent.postMessage( "show", "*" );
+  } else {
+    window.parent.postMessage( "hidden", "*" );
+  }
+  document.getElementById("selectedCount").innerHTML = msg;
+
+
+}
+
+function eventStop(obj) {
+  tdClickedFlg = true;
+
+  if ( cbxClickedFlg ) {
+    cbxClickedFlg = false;
+    return;
+  }
+
+  var cbxObj = obj.getElementsByTagName("input").item(0);
+
+  if ( !cbxObj.checked ) {
+    cbxObj.checked = true;
+  } else {
+    cbxObj.checked = false;
+  }
+  cbxClicked( cbxObj );
+
+
+}
+
+</script>
+
+</head>
+<body>
+
+
+<form name="frm" action="a" method="POST">
+
+<span id="selectedCount" class="caption"> Not selected.</span>
+<table class="bordered fTable">
+    <thead class="fTableHeader">
+
+    <tr>
+        <th>生成</th> 
+        <th>CD</th>        
+        <th>ユーザ名</th>
+        <th>エンジン</th>
+        <th>CDN</th>
+        <th>携帯</th>
+        <th>PDF</th>
+        <th>状態</th>
+        <th>リリース予定日</th>
+        <th>リリース完了日</th>
+    </tr>
+    </thead>
+    <tbody class="fTableBody" id="userInfos">
+    <tr onClick="showDetails(this)">
+        <td name="selUser" onClick="eventStop(this)"><input type="checkbox" name="selUserCbx" onClick="cbxClicked(this)"/></td>
+        <td name="userCode">aa</td>
+        <td name="userName">user1</td>     
+        <td name="engine">JE、JC、JK</td>     
+        <td name="cdn">○</td>
+        <td name="mobile">○</td>
+        <td name="pdf">○</td>
+        <td name="status">完了</td>
+        <td name="planDate">2013/02/15</td>
+        <td name="endDate">2013/02/15</td>
+    </tr>        
+    <tr onClick="showDetails(this)">
+        <td name="selUser" onClick="eventStop(this)"><input type="checkbox" name="selUserCbx"  onClick="cbxClicked(this)"/></td>
+        <td name="userCode">ab</td>
+        <td name="userName">user2</td>     
+        <td name="engine">JE、JC、JK</td>     
+        <td name="cdn">○</td>
+        <td name="mobile">○</td>
+        <td name="pdf">○</td>
+        <td name="status">完了</td>
+        <td name="planDate">2013/02/15</td>
+        <td name="endDate">2013/02/15</td>
+    </tr>
+    <tr onClick="showDetails(this)">
+        <td name="selUser" onClick="eventStop(this)"><input type="checkbox" name="selUserCbx"  onClick="cbxClicked(this)"/></td>
+        <td name="userCode">ac</td>
+        <td name="userName">user3</td>     
+        <td name="engine">JE、JC、JK</td>     
+        <td name="cdn">○</td>
+        <td name="mobile">○</td>
+        <td name="pdf">○</td>
+        <td name="status">完了</td>
+        <td name="planDate">2013/02/15</td>
+        <td name="endDate">2013/02/15</td>
+    </tr>    
+    <tr onClick="showDetails(this)">
+        <td name="selUser" onClick="eventStop(this)"><input type="checkbox" name="selUserCbx"  onClick="cbxClicked(this)" /></td>
+        <td name="userCode">ad</td>
+        <td name="userName">user4</td>     
+        <td name="engine">JE、JC、JK</td>     
+        <td name="cdn">○</td>
+        <td name="mobile">○</td>
+        <td name="pdf">○</td>
+        <td name="status">完了</td>
+        <td name="planDate">2013/02/15</td>
+        <td name="endDate">2013/02/15</td>
+    </tr>
+    <tr onClick="showDetails(this)">
+        <td name="selUser" onClick="eventStop(this)"><input type="checkbox" name="selUserCbx"  onClick="cbxClicked(this)"/></td>
+        <td name="userCode">ae</td>
+        <td name="userName">user5</td>     
+        <td name="engine">JE、JC、JK</td>     
+        <td name="cdn">○</td>
+        <td name="mobile">○</td>
+        <td name="pdf">○</td>
+        <td name="status">完了</td>
+        <td name="planDate">2013/02/15</td>
+        <td name="endDate">2013/02/15</td>
+    </tr>
+    <tr onClick="showDetails(this)">
+        <td name="selUser" onClick="eventStop(this)"><input type="checkbox" name="selUserCbx"  onClick="cbxClicked(this)"/></td>
+        <td name="userCode">af</td>
+        <td name="userName">user6</td>     
+        <td name="engine">JE、JC、JK</td>     
+        <td name="cdn">○</td>
+        <td name="mobile">○</td>
+        <td name="pdf">○</td>
+        <td name="status">完了</td>
+        <td name="planDate">2013/02/15</td>
+        <td name="endDate">2013/02/15</td>
+    </tr>
+    <tr onClick="showDetails(this)">
+        <td name="selUser" onClick="eventStop(this)"><input type="checkbox" name="selUserCbx"  onClick="cbxClicked(this)"/></td>
+        <td name="userCode">ag</td>
+        <td name="userName">user7</td>     
+        <td name="engine">JE、JC、JK</td>     
+        <td name="cdn">○</td>
+        <td name="mobile">○</td>
+        <td name="pdf">○</td>
+        <td name="status">完了</td>
+        <td name="planDate">2013/02/15</td>
+        <td name="endDate">2013/02/15</td>
+    </tr>    
+    <tr onClick="showDetails(this)">
+        <td name="selUser" onClick="eventStop(this)"><input type="checkbox" name="selUserCbx"  onClick="cbxClicked(this)" /></td>
+        <td name="userCode">ah</td>
+        <td name="userName">user8</td>     
+        <td name="engine">JE、JC、JK</td>     
+        <td name="cdn">○</td>
+        <td name="mobile">○</td>
+        <td name="pdf">○</td>
+        <td name="status">完了</td>
+        <td name="planDate">2013/02/15</td>
+        <td name="endDate">2013/02/15</td>
+    </tr>
+    <tr onClick="showDetails(this)">
+        <td name="selUser" onClick="eventStop(this)"><input type="checkbox" name="selUserCbx"  onClick="cbxClicked(this)"/></td>
+        <td name="userCode">ai</td>
+        <td name="userName">user9</td>     
+        <td name="engine">JE、JC、JK</td>     
+        <td name="cdn">○</td>
+        <td name="mobile">○</td>
+        <td name="pdf">○</td>
+        <td name="status">完了</td>
+        <td name="planDate">2013/02/15</td>
+        <td name="endDate">2013/02/15</td>
+    </tr>
+    <tr onClick="showDetails(this)">
+        <td name="selUser" onClick="eventStop(this)"><input type="checkbox" name="selUserCbx"  onClick="cbxClicked(this)"/></td>
+        <td name="userCode">aj</td>
+        <td name="userName">user10</td>     
+        <td name="engine">JE、JC、JK</td>     
+        <td name="cdn">○</td>
+        <td name="mobile">○</td>
+        <td name="pdf">○</td>
+        <td name="status">完了</td>
+        <td name="planDate">2013/02/15</td>
+        <td name="endDate">2013/02/15</td>
+    </tr> 
+    </tbody>
+</table>
+
+
+</body>
+</html>

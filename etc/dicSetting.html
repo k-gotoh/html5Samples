@@ -1,0 +1,230 @@
+<!DOCTYPE html
+<html>
+<head>
+<meta charset="UTF-8" />
+
+<link rel="stylesheet" href="./css/uoul.css">
+<link rel="stylesheet" href="./css/title.css" type="text/css" />
+<link rel="stylesheet" href="./css/button.css" type="text/css" />
+<style type="text/css">
+
+td {padding: 2px 2px 2px 50px;}
+
+span.radialBtn {
+		/* prefix */
+		-moz-border-radius: 40px;
+		-webkit-border-radius: 40px;
+		background-image: -moz-linear-gradient(-90deg,rgba(255,255,255,0.9),rgba(255,255,255,0));
+		background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0,rgba(255,255,255,0.9)), color-stop(1,rgba(255,255,255,0)));
+		text-shadow: 1px 1px 0 rgba(255,255,255,0.6);
+		-webkit-transition: background-color, .5s;
+		-webkit-box-shadow: 1px 1px 4px rgba(0,0,0,0.6);
+		-moz-box-shadow: 1px 1px 4px rgba(0,0,0,0.6);
+
+		color: #333;
+		display: block;
+		text-decoration: none;
+		text-align: center;
+		line-height: 40px;
+		width: 40px;
+		height: 40px;
+	}
+span.radialBtn:hover {
+	background-color: orange;
+	color: #333;
+}
+
+span.btn5 {
+	background-color: #44c0fe;
+	border: solid 1px #777;
+}
+
+
+</style>
+
+<script src="./js/jquery-1.9.0.js"></script>
+<script src="./js/jquery-ui-1.10.0.custom.min.js"></script>
+<script src="./js/jquery.sortable.js"></script>
+<script src="./js/storage.js"></script>
+
+<script>
+$(function() {
+    $( '#sortable1' ) . sortable();
+    $( '#sortable1' ) . disableSelection();
+});
+
+$(function() {
+    $( '#sortable2' ) . sortable();
+    $( '#sortable2' ) . disableSelection();
+});
+
+
+
+$(function() {
+ sortableSet();
+});
+
+function sortableSet(){
+	$('#sortable1, #sortable2').sortable({
+		connectWith: '.connected'
+	});
+ 
+        $('#sortable1').sortable('disable');
+	$('#sortable1').sortable({
+		items: ':not(.disabled)'
+	});
+
+        $('#sortable2').sortable('disable');
+	$('#sortable2').sortable({
+		items: ':not(.disabled)'
+	});
+}
+
+function save() {
+  var selectedDicList = new Array();
+  var dicList = document.getElementById("sortable1").getElementsByTagName("li");
+  
+  for ( i = 0; i < dicList.length; i++ ) {
+    selectedDicList.push( dicList.item(i).innerText );
+
+  }
+  window.parent.postMessage(selectedDicList.join(),"*");
+
+
+
+}
+
+currentEID = "";
+
+function dataSave() {
+  var data = new Object;
+
+  var useDic = new Array();
+  var useLiList = document.getElementById("sortable1").getElementsByTagName("li");
+  
+  if ( useLiList.length != 0 ) {
+    for (var i = 0; i < useLiList.length; i++ ) {
+      var dic = useLiList.item(i).getAttribute("id") + "\t" + useLiList.item(i).innerHTML;
+      useDic.push( dic );
+    }
+  }
+  data.useDic = useDic.join();
+
+
+  var nonUseDic = new Array();
+  var nonUseLiList = document.getElementById("sortable2").getElementsByTagName("li");
+  
+  if ( nonUseLiList.length != 0 ) {
+    for (var i = 0; i < nonUseLiList.length; i++ ) {
+      var dic = nonUseLiList.item(i).getAttribute("id") + "\t" + nonUseLiList.item(i).innerHTML;
+      nonUseDic.push( dic );
+    }
+  }
+  data.nonUseDic = nonUseDic.join();
+
+
+  setStorage( currentEID, data );
+}
+
+
+
+function restoreData() {
+  
+  var getParam = getRequest();
+  currentEID = getParam["dicId"];
+
+  var data = getStorage( currentEID );
+
+  if ( !data ) {
+    return;
+  }
+
+  var useDic = data.useDic.split(",");
+  if ( useDic.length != 0 ) {
+    var target = document.getElementById("sortable1");
+    allLiDel( target );
+    for ( var i = 0; i < useDic.length; i++ ) {
+      var dicInfo = useDic[i].split("\t");
+      var newLi = document.createElement("li");
+      newLi.setAttribute("id", dicInfo[0]);
+      newLi.setAttribute("class", "ui-state-default");
+      newLi.innerHTML = dicInfo[1] ;
+      target.appendChild( newLi );
+    }
+  }
+
+
+  var nonUseDic = data.nonUseDic.split(",");
+  if ( nonUseDic.length != 0 ) {
+    var target = document.getElementById("sortable2");
+    allLiDel( target );
+    for ( var i = 0; i < nonUseDic.length; i++ ) {
+      var dicInfo = nonUseDic[i].split("\t");
+      var newLi = document.createElement("li");
+      newLi.setAttribute("id", dicInfo[0]);
+      newLi.setAttribute("class", "ui-state-default");
+      newLi.innerHTML = dicInfo[1] ;
+      target.appendChild( newLi );
+    }
+  }
+
+  sortableSet();
+}
+
+function allLiDel( elm ) {
+  var liList = elm.getElementsByTagName("li");
+  for ( var i = liList.length - 1; i >= 0; i-- ) {
+    elm.removeChild( liList.item(i) );
+  } 
+}
+
+
+
+//GETパラメータ取得
+function getRequest(){
+  if(location.search.length > 1) {
+    var get = new Object();
+    var ret = location.search.substr(1).split("&");
+    for(var i = 0; i < ret.length; i++) {
+      var r = ret[i].split("=");
+      get[r[0]] = r[1];
+    }
+    return get;
+  } else {
+    return false;
+  }
+}
+
+</script>
+</head>
+<body  onLoad="restoreData()" onBeforeUnload="return dataSave()">
+<br />
+<p class="title" style="display: inline-block; _display: inline;">　　辞書設定</p>
+　　　　<span class="radialBtn btn5" style="display: inline-block; _display: inline;">決定</span>
+
+<table border="0" >
+<tr><td width=400px valign="top">
+<ol id="sortable1" class="rectangle-list">
+
+<li id="dic1" class="ui-state-default">基本</li>
+<li id="dic2" class="ui-state-default">基礎医学</li>
+<li id="dic3" class="ui-state-default">精神医学</li>
+<li id="dic4" class="ui-state-default">歯学</li>
+<li id="dic5" class="ui-state-default">薬学</li>
+</ol>
+</td>
+<td valign="top">
+<ol id="sortable2" class="rounded-list">
+
+<li id="dic10" class="ui-state-default">感覚器</li>
+<li id="dic11" class="ui-state-default">公衆衛生</li>
+<li id="dic12" class="ui-state-default">電気電子</li>
+<li id="dic13" class="ui-state-default">旅行会話</li>
+<li id="dic14" class="ui-state-default">臨床医学</li>
+</ol>
+
+</td>
+</tr></table>
+
+</body>
+</html>

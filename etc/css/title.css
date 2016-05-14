@@ -1,0 +1,14 @@
+
+p.title {
+  color:#44c0fe;
+  font-size: 28px;
+  text-shadow:0 -1px 0 rgba(255,255,255,0.6),0 1px 1px rgba(0,0,0,0.5);
+}
+p.title:before {
+  color:#0036b4;
+  -webkit-mask-image:-webkit-linear-gradient(-85deg, rgba(0,0,0,0), rgba(0,0,0,0) 40%, rgba(0,0,0,1) 80%, rgba(0,0,0,1));
+}
+p.title:after {
+  color:#d7edff;
+  -webkit-mask-image:-webkit-linear-gradient(-85deg, rgba(0,0,0,1), rgba(0,0,0,1) 10%, rgba(0,0,0,0.25) 48%, rgba(0,0,0,0) 48%, rgba(0,0,0,0));
+}

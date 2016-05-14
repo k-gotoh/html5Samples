@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns="http://www.w3.org/1999/xhtml">
+<title>@HP自動化ツール</title>
+<link rel="shortcut icon" href="./favicon.ico"> 
+<head>
+<meta charset="UTF-8" />
+<link rel="stylesheet" href="./css/header.css" />
+<link rel="stylesheet" href="./css/title.css" type="text/css" />
+<link rel="stylesheet" href="./css/button.css" type="text/css" />
+<link rel="stylesheet" href="./css/roundedTextBox.css" type="text/css" />
+<link rel="stylesheet" href="./css/captionText.css" type="text/css" />
+<link rel="stylesheet" href="./css/uoul.css" type="text/css" />
+<link rel="stylesheet" href="./css/checkBoxGroup.css" type="text/css" />
+<link rel="stylesheet" href="./css/pageCurl.css" type="text/css" />
+<link rel="stylesheet" href="./css/animate.css" />
+
+<style type="text/css">
+
+</style>
+<script src="./js/jquery-1.9.0.js"></script>
+
+<script src="./js/jquery-ui-1.10.0.custom.min.js"></script>
+<script src="./js/jquery.sortable.js"></script>
+
+<script src="./js/jquery.min.js"></script>
+<script src="./js/textualizer.js"></script>
+<script src="./js/storage.js"></script>
+
+<script language="javascript" type="text/javascript">
+
+
+$(function() {
+    var list = [document.getElementById("headetTitleHidden").value]; // 目的のテキストを指定
+    var txt = $('#headerTitle'); // id名を指定
+    var options = {
+        duration: 10,
+        rearrangeDuration: 10,
+        effect: 'random',
+        centered: true
+    }
+ 
+    txt.textualizer(list, options);
+    txt.textualizer('start');
+});
+
+
+
+$(function(){
+	//チェックボックス
+	$('div.check-group label').toggle(
+		function () {
+			$(this)
+				.addClass('checked')
+				.prev('input').attr('checked','checked');
+		},
+		function () {
+			$(this)
+				.removeClass('checked')
+				.prev('input').removeAttr('checked');
+		}
+	);
+});
+
+/*
+$(function() {
+    $( '#sortable1' ) . sortable();
+    $( '#sortable1' ) . disableSelection();
+});
+*/
+function cancel(obj) {
+  var clientName = document.getElementById("headerTitle"); 
+  if (obj.checked ) {
+     clientName.setAttribute("class","animated hinge pCurlDrop-shadow pCurlLifted");
+  } else {
+     clientName.setAttribute("class","pCurlDrop-shadow pCurlLifted");
+  }
+}
+
+function inputedText() {
+  document.getElementById("headerTitle").innerHTML = document.getElementById("clienetName").value + "(" + document.getElementById("planDate").value + ")";
+}
+
+STORAGE_KEY = "basic";
+
+function dataSave() {
+  var data = new Object;
+  data.clienetID = document.getElementById("clienetID").value;
+  data.clienetName = document.getElementById("clienetName").value;
+  data.planDate = document.getElementById("planDate").value;
+  data.cancel = document.getElementById("cancel").checked;
+  data.settingID = document.getElementById("settingID").value;
+  data.useCDN = document.getElementById("useCDN").checked;
+  data.useCellular = document.getElementById("useCellular").checked;
+  data.usePDF = document.getElementById("usePDF").checked;
+
+  setStorage( STORAGE_KEY, data )
+}
+
+function restoreData() {
+
+  var data = getStorage( STORAGE_KEY );
+
+  if ( !data ) {
+    return;
+  }
+
+  document.getElementById("clienetID").value =  data.clienetID;
+  document.getElementById("clienetName").value = data.clienetName;
+  document.getElementById("planDate").value = data.planDate;
+  document.getElementById("cancel").checked = data.cancel;
+  document.getElementById("settingID").value = data.settingID ? data.settingID : "";
+  
+  if ( data.useCDN ) {
+    document.getElementById("useCDN").setAttribute("checked","checked");
+    document.getElementById("useCDNLabel").setAttribute("class","checked");
+  }
+
+  if ( data.useCellular ) {
+    document.getElementById("useCellular").setAttribute("checked","checked");
+    document.getElementById("useCellularLabel").setAttribute("class","checked");
+  }
+
+  if ( data.usePDF ) {
+    document.getElementById("usePDF").setAttribute("checked","checked");
+    document.getElementById("usePDFLabel").setAttribute("class","checked");
+  }
+
+
+}
+
+</script>
+</head>
+<body onLoad="restoreData()" onBeforeUnload="return dataSave()">
+<script src="./js/header.js"></script>
+
+
+<table border="0"><tr><td width="350px">
+<p class="title"> 基本設定</p></td>
+<td width="900px" align="center"><p id="headerTitle" class="pCurlDrop-shadow pCurlLifted">クロスランゲージ市役所(2013/02/15)</p></td>
+</tr></table>
+
+<table border="0"><tr><td>
+<table><tr><td>
+
+</td></tr></table>
+<table border="0">
+<tr>
+<td valign="center" width="200px">
+<span class="caption">クライアント名</span>
+</td>
+<td valign="center">
+<input id="clienetName" class="rounded" type="text" size="100" onkeyup="inputedText()"/>
+</td>
+</tr>
+
+<tr>
+<td valign="center">
+<span class="caption">クライアントID</span>
+</td>
+<td valign="center">
+<input id="clienetID" class="rounded" type="text" size="5" />
+　<span class="caption">リリース予定日</span>
+<input type="date" id="planDate" class="rounded" onChange="inputedText()">
+
+　　　　<span class="caption"><label for="cancel">解約</labe></span><input type="checkbox" class="rounded" id="cancel" onClick="return cancel(this)"/>
+</td>
+</tr>
+
+<tr>
+<td valign="center">
+<span class="caption">設定ID</span>
+</td>
+<td valign="center">
+<input id="settingID" class="rounded" type="text" size="12" />
+</td>
+</tr>
+
+
+<tr>
+<td valign="center">
+<span class="caption">使用の有無</span>
+</td>
+<td valign="center">
+
+<div class="check-group clearfix">
+	<div>
+		<input id="useCDN" type="checkbox" name="check[]" value="c1" />
+		<label id="useCDNLabel" for="useCDN">　CDN　</label>
+	</div>
+	<div>
+		<input id="useCellular" type="checkbox" name="check[]" value="c2" />
+		<label id="useCellularLabel" for="useCellular">　携帯　</label>
+	</div>
+	<div>
+		<input id="usePDF" type="checkbox" name="check[]" value="c3" />
+		<label id="usePDFLabel" for="usePDF">　PDF　</label>
+	</div>
+</div>
+</td>
+</tr>
+
+
+<tr>
+<td valign="top">
+<br />
+<span class="caption">対象url</span> <a href="./urlSetting.html" class="button play"  onClick="return lineAdd()">設定</a>
+</td>
+<td valign="center">
+
+<ol class="rounded-list"  >
+<li class="ui-state-default">http://hogehoge.com</li>
+<li class="ui-state-default">http://cross.hogehoge.com</li>
+<li class="ui-state-default">http://xxx.hogehoge.com</li>
+<li class="ui-state-default">http://zzz.hogehoge.com</li>
+</ol>
+
+</td>
+</tr>
+
+
+
+<tr>
+<td valign="top">
+<br />
+<span class="caption">エンジン</span>
+<a href="./engineSetting.html" class="button play"  onClick="return lineAdd()">設定</a>
+</td>
+<td valign="center">
+
+<ol class="rounded-list"  >
+<li class="ui-state-default">日→英</li>
+<li class="ui-state-default">日→中</li>
+<li class="ui-state-default">日韓</li>
+</ol>
+</td>
+</tr>
+
+
+
+
+<tr>
+<td valign="top">
+<span class="caption">charset</span>
+<a href="charSetSetting.html" class="button play"  onClick="return lineAdd()">設定</a>
+</td>
+<td valign="center">
+<ol class="rounded-list"  >
+<li class="ui-state-default">UTF-8</li>
+<li class="ui-state-default">http://xxxxxxxxx SHIFT_JIS</li>
+</ol>
+
+</td>
+</tr>
+
+
+
+<tr>
+<td valign="top">
+<br />
+<span class="caption">対象外url</span> <a href="./excludeUrlSetting.html" class="button play"  onClick="return lineAdd()">設定</a>
+</td>
+<td valign="center">
+
+<ol class="rounded-list"  >
+<li class="ui-state-default">http://hogehoge.com/exclude</li>
+<li class="ui-state-default">http://cross.hogehoge.com/exclude</li>
+<li class="ui-state-default">http://xxx.hogehoge.com/exclude</li>
+<li class="ui-state-default">http://zzz.hogehoge.com/exclude</li>
+</ol>
+
+</td>
+</tr>
+</table>
+
+</td>
+<td valign="top" style="padding:10px 0px 0px 50px; ">
+
+<span class="caption">リリース履歴</span>
+<ol id="sortable1" class="rectangle-list">
+<li class="ui-state-default">2013/02/04 登録</li>
+<li class="ui-state-default">2013/02/05 開発チェック</li>
+<li class="ui-state-default">2013/02/07 リリース済</li>
+
+</ol>
+</td>
+</tr>
+</table>
+<input id="headetTitleHidden" type="hidden" value="クロスランゲージ区役所(2013/02/15)" />
+</body>
+</html>

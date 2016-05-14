@@ -1,0 +1,432 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<title>@HP自動化ツール</title>
+<link rel="shortcut icon" href="./favicon.ico"> 
+<meta charset="UTF-8" /><title></title>
+
+<link rel="stylesheet" href="./css/header.css" />
+<link rel="stylesheet" href="./css/title.css" type="text/css" />
+<link rel="stylesheet" href="./css/captionText.css" type="text/css" />
+<link rel="stylesheet" href="./css/button.css" type="text/css" />
+<link rel="stylesheet" href="./css/animate.css" />
+<link rel="stylesheet" href="./css/pageCurl.css" type="text/css" />
+<style type="text/css">
+
+.onoffswitch {
+    position: relative; width: 70px;
+    -webkit-user-select:none; -moz-user-select:none; -ms-user-select: none;
+}
+.onoffswitch-checkbox {
+    display: none;
+}
+.onoffswitch-label {
+    display: block; overflow: hidden; cursor: pointer;
+    border: 2px solid #999999; border-radius: 20px;
+}
+.onoffswitch-inner {
+    width: 200%; margin-left: -100%;
+    -moz-transition: margin 0.3s ease-in 0s; -webkit-transition: margin 0.3s ease-in 0s;
+    -o-transition: margin 0.3s ease-in 0s; transition: margin 0.3s ease-in 0s;
+}
+.onoffswitch-inner:before, .onoffswitch-inner:after {
+    float: left; width: 50%; height: 20px; padding: 0; line-height: 20px;
+    font-size: 14px; color: white; font-family: Trebuchet, Arial, sans-serif; font-weight: bold;
+    -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
+}
+.onoffswitch-inner:before {
+    content: "ON";
+    padding-left: 10px;
+    background-color: #2FCCFF; color: #FFFFFF;
+}
+.onoffswitch-inner:after {
+    content: "OFF";
+    padding-right: 10px;
+    background-color: #EEEEEE; color: #999999;
+    text-align: right;
+}
+.onoffswitch-switch {
+    width: 18px; margin: 1px;
+    background: #FFFFFF;
+    border: 2px solid #999999; border-radius: 20px;
+    position: absolute; top: 0; bottom: 0; right: 46px;
+    -moz-transition: all 0.3s ease-in 0s; -webkit-transition: all 0.3s ease-in 0s;
+    -o-transition: all 0.3s ease-in 0s; transition: all 0.3s ease-in 0s; 
+}
+.onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-inner {
+    margin-left: 0;
+}
+.onoffswitch-checkbox:checked + .onoffswitch-label .onoffswitch-switch {
+    right: 0px; 
+}
+
+iframe.enabled {-moz-border-radius: 25px;
+-webkit-border-radius: 25px;
+border-radius: 25px;
+/*IE 7 AND 8 DO NOT SUPPORT BORDER RADIUS*/
+-moz-box-shadow: 0px 0px 20px #000000;
+-webkit-box-shadow: 0px 0px 20px #000000;
+box-shadow: 0px 0px 20px #000000;
+/*IE 7 AND 8 DO NOT SUPPORT BLUR PROPERTY OF SHADOWS*/
+}
+
+</style>
+
+<script src="./js/storage.js"></script>
+
+<script type="text/javascript" src="./js/jquery.js"></script>
+<script src="./js/jquery-1.9.0.js"></script>
+<script src="./js/textualizer.js"></script>
+
+
+<script type="text/javascript">
+
+currentButton = "";
+
+function clickSwitch(cbx){
+   
+  
+   
+  dicFrameClear();
+    cbx.setAttribute("checked",cbx.checked );
+    if ( cbx.checked ) {
+      // document.getElementById("button" + cbx.id).innerHTML = "辞書設定";
+      // document.getElementById("button" + cbx.id).setAttribute( "class","button play" );
+       
+       document.getElementById("div" + cbx.id).setAttribute( "class","animated bounceInRight" );
+
+    } else {
+      // document.getElementById("button" + cbx.id).innerHTML = "辞書設";
+      // document.getElementById("button" + cbx.id).setAttribute( "class","" );
+       document.getElementById("div" + cbx.id).setAttribute( "class","animated bounceOutRight" );
+
+    }
+}
+
+
+  function dicFrameClear() {
+    document.getElementById("dicFrame").setAttribute("class","");
+    var engineList = document.getElementsByTagName("a");
+    for ( i = 0; i < engineList.length; i++ ) {
+      engineNode = engineList.item(i).style.color = "#000";
+    }
+    dicFrame.location = "./blank.html";
+    
+}
+
+
+function dicClick(obj) {
+
+   var engineList = document.getElementsByTagName("a");
+   for ( i = 0; i < engineList.length; i++ ) {
+     var engineNode = engineList.item(i);
+     if ( engineNode.id == obj.id ) {
+       engineNode.style.color = "#f00";
+     } else {
+       engineNode.style.color = "#000";
+     }
+   }
+   document.getElementById("dicFrame").setAttribute("class","enabled");
+   currentButton = obj;
+}
+
+
+
+window.addEventListener("message", function(e){
+  currentButton.title = e.data;
+
+},false);
+
+
+
+$(function() {
+    var list = [document.getElementById("headerTitleHidden").value]; // 目的のテキストを指定
+    var txt = $('#headerTitle'); // id名を指定
+    var options = {
+        duration: 10,
+        rearrangeDuration: 10,
+        effect: 'random',
+        centered: true
+    }
+ 
+    txt.textualizer(list, options);
+    txt.textualizer('start');
+});
+
+
+STORAGE_KEY = "selectedEID";
+
+function dataSave() {
+  var data = new Object;
+
+  var selectList = new Array();
+  var selectCheckList = document.getElementsByClassName("selectCheck");
+  
+  if ( selectCheckList.length != 0 ) {
+    for (var i = 0; i < selectCheckList.length; i++ ) {
+      if ( selectCheckList.item(i).getAttribute("checked") == "true" ) {
+        selectList.push( selectCheckList.item(i).getAttribute("id") );
+      }
+    }
+  }
+  
+  data.selectedEID = selectList.join();
+  setStorage( STORAGE_KEY, data )
+}
+
+
+
+function restoreData() {
+  var data = getStorage( STORAGE_KEY );
+
+  if ( !data ) {
+    return;
+  }
+
+  var selectedEid = data.selectedEID.split(",");
+  if ( selectedEid.length == 0 ) {
+    return;
+  }
+
+  for ( var i = 0; i < selectedEid.length; i++ ) {
+    document.getElementById( selectedEid[i] ).setAttribute("checked","true");
+    document.getElementById("div" + selectedEid[i] ).setAttribute( "class","animated bounceInRight" );
+  }
+
+}
+
+</script>
+
+
+</head>
+<body  onLoad="restoreData()" onBeforeUnload="return dataSave()">
+
+<input id="headerTitleHidden" type="hidden" value="クロスランゲージ区役所(2013/02/15)" />
+<script src="./js/header.js"></script>
+
+<table border="0"><tr><td width="350px">
+<p class="title"> エンジン設定</p></td>
+<td width="900px" align="center"><p id="headerTitle" class="pCurlDrop-shadow pCurlLifted"></p></td>
+</tr></table>
+
+
+
+<table border="0">
+<tr><td valign="top" width="400px">
+<div id="engineList">
+
+
+<table border="0">
+
+<tr>
+<td width="100px" height="40px">
+<span class="caption">日→英</span>
+</td>
+<td>
+
+
+<div class="onoffswitch">
+    <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="JE" checked="true"  onClick="return clickSwitch(this)">
+
+</td>
+<td>
+<div id="divJE" class="animated bounceInRight">
+<a href="dicSetting.html?dicId=JE" target="dicFrame" id="buttonJE" class="button play"  onClick="return dicClick(this)" title="">辞書設定</a>
+</div>
+</td>
+</tr>
+
+
+
+<tr>
+<td width="100px" height="40px">
+<span class="caption">日→中(簡）</span>
+</td>
+<td>
+</td>
+<td>
+<div id="divJC" class="animated bounceInRight">
+<a href="dicSetting.html?dicId=JC" target="dicFrame" id="buttonJC" class="button play"  onClick="return dicClick(this)">辞書設定</a>
+</div>
+</td>
+</tr>
+
+
+
+<tr>
+<td width="100px" height="40px">
+<span class="caption">日→中(繁）</span>
+</td>
+<td>
+</td>
+<td>
+<div id="divJCT" class="animated bounceInRight">
+<a href="dicSetting.html?dicId=JCT" target="dicFrame" id="buttonJCT" class="button play"  onClick="return dicClick(this)">辞書設定</a>
+</div>
+</td>
+</tr>
+
+
+
+<tr>
+<td width="100px" height="40px">
+<span class="caption">日→韓</span>
+</td>
+<td>
+
+</td>
+<td>
+<div id="divJK" class="animated bounceInRight">
+<a href="dicSetting.html?dicId=JK" target="dicFrame" id="buttonJK" class="button play"  onClick="return dicClick(this)">辞書設定</a>
+</div>
+</td>
+</tr>
+
+
+
+
+
+<tr>
+<td width="100px" height="40px">
+<span class="caption">日→ドイツ</span>
+</td>
+<td>
+<div class="onoffswitch">
+    <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox selectCheck" id="JDE"  onClick="clickSwitch(this)">
+    <label class="onoffswitch-label" for="JDE">
+        <div class="onoffswitch-inner"></div>
+        <div class="onoffswitch-switch"></div>
+    </label>
+ </div>
+</td>
+<td>
+<div id="divJDE" class="animated bounceOutRight">
+<a href="dicSetting.html?dicId=JDE" target="dicFrame" id="buttonJDE" class="button play"  onClick="return dicClick(this)">辞書設定</a>
+</div>
+</td>
+</tr>
+
+
+
+<tr>
+<td width="100px" height="40px">
+<span class="caption">日→イタリア</span>
+</td>
+<td>
+<div class="onoffswitch">
+    <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox selectCheck" id="JIT"  onClick="clickSwitch(this)">
+    <label class="onoffswitch-label" for="JIT">
+        <div class="onoffswitch-inner"></div>
+        <div class="onoffswitch-switch"></div>
+    </label>
+ </div>
+</td>
+<td>
+<div id="divJIT" class="animated bounceOutRight">
+<a href="dicSetting.html?dicId=JIT" target="dicFrame" id="buttonJIT" class="button play"  onClick="return dicClick(this)">辞書設定</a>
+</div>
+</td>
+</tr>
+
+<tr>
+<td width="100px" height="40px">
+<span class="caption">日→ポルトガル</span>
+</td>
+<td>
+<div class="onoffswitch">
+    <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox selectCheck" id="JPT"  onClick="clickSwitch(this)">
+    <label class="onoffswitch-label" for="JPT">
+        <div class="onoffswitch-inner"></div>
+        <div class="onoffswitch-switch"></div>
+    </label>
+ </div>
+</td>
+<td>
+<div id="divJPT" class="animated bounceOutRight">
+<a href="dicSetting.html?dicId=JPT" target="dicFrame" id="buttonJPT" class="button play"  onClick="return dicClick(this)">辞書設定</a>
+</div>
+</td>
+</tr>
+
+
+<tr>
+<td width="100px" height="40px">
+<span class="caption">日→スペイン</span>
+</td>
+<td>
+<div class="onoffswitch">
+    <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox  selectCheck" id="JES"  onClick="clickSwitch(this)">
+    <label class="onoffswitch-label" for="JES">
+        <div class="onoffswitch-inner"></div>
+        <div class="onoffswitch-switch"></div>
+    </label>
+ </div>
+</td>
+<td>
+<div id="divJES" class="animated bounceOutRight">
+<a href="dicSetting.html?dicId=JES" target="dicFrame" id="buttonJES" class="button play"  onClick="return dicClick(this)">辞書設定</a>
+</div>
+</td>
+</tr>
+
+
+<tr>
+<td width="100px" height="40px">
+<span class="caption">日→フランス</span>
+</td>
+<td>
+<div class="onoffswitch">
+    <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox selectCheck" id="JFR"  onClick="clickSwitch(this)">
+    <label class="onoffswitch-label" for="JFR">
+        <div class="onoffswitch-inner"></div>
+        <div class="onoffswitch-switch"></div>
+    </label>
+ </div>
+</td>
+<td>
+<div id="divJFR" class="animated bounceOutRight">
+<a href="dicSetting.html?dicId=JFR" target="dicFrame" id="buttonJFR" class="button play"  onClick="return dicClick(this)">辞書設定</a>
+</div>
+</td>
+</tr>
+
+
+<tr>
+<td width="100px" height="40px">
+<span class="caption">日→ロシア</span>
+</td>
+<td>
+<div class="onoffswitch">
+    <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox selectCheck" id="JRU"  onClick="clickSwitch(this)">
+    <label class="onoffswitch-label" for="JRU">
+        <div class="onoffswitch-inner"></div>
+        <div class="onoffswitch-switch"></div>
+    </label>
+ </div>
+</td>
+<td>
+<div id="divJRU" class="animated bounceOutRight">
+<a href="dicSetting.html?dicId=JRU" target="dicFrame" id="buttonJRU" class="button play"  onClick="return dicClick(this)">辞書設定</a>
+</div>
+</td>
+</tr>
+
+
+
+
+
+</table>
+</div>
+</td>
+<td valign="top">
+<br />
+<iframe src="./blank.html" id="dicFrame" name="dicFrame" frameborder="0" width="800px" height="1000px"/>
+
+</td>
+</tr>
+</table>
+
+
+</body>
+</html>

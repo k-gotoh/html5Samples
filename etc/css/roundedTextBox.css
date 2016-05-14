@@ -1,0 +1,10 @@
+/* 角丸テキストボックス*/
+.rounded {
+  border:1px #888888 dotted;
+  border-radius: 5px;
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+}
+.rounded:hover {
+   border:1px #aaaacc solid;
+}

@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>@HP自動化ツール</title>
+<link rel="shortcut icon" href="./favicon.ico"> 
+<meta charset="UTF-8" />
+
+<link rel="stylesheet" href="./css/header.css" />
+<link rel="stylesheet" href="./css/roundedTextBox.css" type="text/css" />
+<link rel="stylesheet" href="./css/checkBoxGroup.css" type="text/css" />
+<link rel="stylesheet" href="./css/animate.css" />
+<style type="text/css">
+.noReturn {
+	display: inline-block;
+	_display: inline;
+}
+</style>
+
+<link rel="stylesheet" href="./css/button.css" type="text/css" />
+<link rel="stylesheet" href="./css/captionText.css" type="text/css" />
+<link rel="stylesheet" href="./css/title.css" type="text/css" />
+
+<!-- 0パディング等-->
+<script type="text/javascript" src="./css/common.js"></script>
+<script type="text/javascript" src="./js/jquery.min.js"></script>
+
+<script language="javascript" type="text/javascript">
+$(function(){
+	//チェックボックス
+	$('div.check-group label').toggle(
+		function () {
+			$(this)
+				.addClass('checked')
+				.prev('input').attr('checked','checked');
+		},
+		function () {
+			$(this)
+				.removeClass('checked')
+				.prev('input').removeAttr('checked');
+		}
+	);
+});
+
+//インラインフレームでクリックされたユーザコードの受信(XDM)
+window.addEventListener("message", function(e){
+
+  switch ( e.data ) {
+    case "hidden":
+     // document.getElementById("createButton").style.visibility = "hidden";
+      document.getElementById("createButton").setAttribute("class","animated fadeOut");
+      break;
+    
+    case "show":
+     // document.getElementById("createButton").style.visibility = "visible";
+      document.getElementById("createButton").setAttribute("class","animated fadeIn");
+      break;
+
+    default:
+      document.getElementById("selectedUserCode").value = e.data;
+      document.showDetail.submit();
+      break;
+
+  }
+
+
+}, false);
+
+
+function sendMessageCreateFile() {
+       window.frames[0].postMessage( "createFiles", "*" );
+
+}
+</script>
+</head>
+<body>
+
+
+<script src="./js/settingHeader.js"></script>
+<table border="0">
+<tr><td>
+<p class="title">ユーザ一覧</p>
+</td></tr></table>
+
+<form name="frm" action="a" method="POST">
+
+
+
+<table><tr><td width="480px">
+　<span class="caption">ユーザ名</span>
+<input type="text" class="rounded" id="userName" size='26' />
+
+<span class="caption">ユーザコード</span>
+<input type="text" class="rounded" id="userCode" size='5' />
+</td><td width="300px">
+<div class="check-group clearfix">
+	<div>
+		<input id="checkbox1" type="checkbox" name="check[]" value="c1" />
+		<label for="checkbox1">　CDN　</label>
+	</div>
+	<div>
+		<input id="checkbox2" type="checkbox" name="check[]" value="c2" />
+		<label for="checkbox2">　携帯　</label>
+	</div>
+	<div>
+		<input id="checkbox3" type="checkbox" name="check[]" value="c3" />
+		<label for="checkbox3">　PDF　</label>
+	</div>
+</div>
+</td></tr>
+<tr><td>
+　<span class="caption">リリース予定日</span>
+<input type="date" id="planDateFrom" class="rounded">
+　<span class="caption">～</span>　
+<input type="date" id="planDateTo" class="rounded">
+</td><td>
+
+<div class="check-group clearfix">
+	<div>
+		<input id="checkbox1" type="checkbox" name="check[]" value="c1" />
+		<label for="checkbox1">　登録　</label>
+	</div>
+	<div>
+		<input id="checkbox2" type="checkbox" name="check[]" value="c2" />
+		<label for="checkbox2">チェック</label>
+	</div>
+	<div>
+		<input id="checkbox3" type="checkbox" name="check[]" value="c3" />
+		<label for="checkbox3">　完了　</label>
+	</div>
+</div>
+</td></tr>
+</table>
+
+<br />
+　<a href="./userListAnser.html" target="userListAnser" class="button play"  onClick="">検索</a>
+　　　　　<a href="#" class="button add"  onClick="">新規追加</a>
+　　　　　　　<span id="createButton" class="animated bounceOutRight"><a href="#" title="下記の一覧でチェックされたユーザの設定ファイルを生成します。" class="button spark" onClick="sendMessageCreateFile()">生成</a></span><br /><br />
+
+</form>
+
+<form action="./basicSetting.html" id="showDetail" name="showDetail" method="POST">
+<input type="hidden" id="selectedUserCode"> 
+</form>
+
+<iframe src="./currentInfo.html" id="userListAnser" name="userListAnser" frameborder="0" width="1000px" height="1000px" />
+
+</body>
+</html>

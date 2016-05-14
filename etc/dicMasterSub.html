@@ -1,0 +1,465 @@
+<!DOCTYPE html
+<html>
+<head>
+<meta charset="UTF-8" />
+
+<link rel="stylesheet" href="./css/uoul.css">
+<link rel="stylesheet" href="./css/title.css" type="text/css" />
+<link rel="stylesheet" href="./css/button.css" type="text/css" />
+<link rel="stylesheet" href="./css/captionText.css" type="text/css" />
+<link rel="stylesheet" href="./css/animate.css" />
+<link rel="stylesheet" href="./css/dialog.css" />
+<link rel="stylesheet" href="./css/trashStyle.css" type="text/css" />
+<link rel="stylesheet" href="./css/roundedTextBox.css" type="text/css" />
+<style type="text/css">
+
+td {padding: 2px 2px 2px 50px;}
+
+span.radialBtn {
+		/* prefix */
+		-moz-border-radius: 40px;
+		-webkit-border-radius: 40px;
+		background-image: -moz-linear-gradient(-90deg,rgba(255,255,255,0.9),rgba(255,255,255,0));
+		background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0,rgba(255,255,255,0.9)), color-stop(1,rgba(255,255,255,0)));
+		text-shadow: 1px 1px 0 rgba(255,255,255,0.6);
+		-webkit-transition: background-color, .5s;
+		-webkit-box-shadow: 1px 1px 4px rgba(0,0,0,0.6);
+		-moz-box-shadow: 1px 1px 4px rgba(0,0,0,0.6);
+
+		color: #333;
+		display: block;
+		text-decoration: none;
+		text-align: center;
+		line-height: 40px;
+		width: 40px;
+		height: 40px;
+	}
+span.radialBtn:hover {
+	background-color: orange;
+	color: #333;
+}
+
+span.btn5 {
+	background-color: #44c0fe;
+	border: solid 1px #777;
+}
+
+
+nol.nonSelected {
+    counter-reset:li; /* Initiate a counter */
+    padding:0; /* Remove the default left padding */
+    list-style:none; /* Disable the normal item numbering */
+}
+ol.nonSelected li {
+    position:relative; /* Create a positioning context */
+    margin:0 0 3px 1em; /* Give each list item a left margin to make room for the numbers */
+    padding:3px 1px;
+    border-top:2px solid #666;
+    background:#f6f6f6;
+}
+ol.nonSelected li:before {
+    content:counter(li); /* Use the counter as content */
+    counter-increment:li; /* Increment the counter by 1 */
+    /* Position and style the number */
+    position:absolute;
+    top:-2px;
+    left:-2em;
+    width:2em;
+    padding:4px 0;
+    border-top:2px solid #666;
+    color:#fff;
+    background:#666;
+    font-weight:bold;
+    font-family:"Helvetica Neue", Arial, sans-serif;
+    text-align:center;
+}
+
+div#dropbox {
+ width:142px;
+ height:110px;
+ -khtml-user-drag: element;
+}
+
+#dialog{
+  color:#fff;
+  -moz-box-shadow: 10px 3px 15px #888888;
+  -webkit-box-shadow: 10px 3px 15px #888888;
+background:#fcfcfc;
+
+}
+
+.fire {
+font-weight: 500;
+text-shadow: 0 0 4px #ccc, 0 -5px 4px #ff3, 2px -10px 6px #fd3, -2px -15px 11px #f80, 2px -18px 18px #f20;
+
+}
+
+
+</style>
+
+
+<script src="./js/jquery-1.9.0.js"></script>
+<script src="./js/jquery-ui-1.10.0.custom.min.js"></script>
+<script src="./js/jquery.sortable.js"></script>
+<script>
+
+$(function() {
+    $( '#sortable1' ) . sortable();
+    $( '#sortable1' ) . disableSelection();
+});
+
+$(function() {
+    $( '#sortable2' ) . sortable();
+    $( '#sortable2' ) . disableSelection();
+});
+
+$(function() {
+    $( '#sortable3' ) . sortable();
+    $( '#sortable3' ) . disableSelection();
+});
+
+
+$(function() {
+
+	$('#sortable1, #sortable2, #sortable3').sortable({
+		connectWith: '.connected'
+	});
+ 
+        $('#sortable1').sortable('disable');
+	$('#sortable1').sortable({
+		items: ':not(.disabled)'
+	});
+
+        $('#sortable2').sortable('disable');
+	$('#sortable2').sortable({
+		items: ':not(.disabled)'
+	});
+
+
+        $('#sortable3').sortable('disable');
+	$('#sortable3').sortable({
+		items: ':not(.disabled)'
+	});
+});
+
+function save() {
+  var selectedDicList = new Array();
+  var dicList = document.getElementById("sortable1").getElementsByTagName("li");
+  
+  for ( i = 0; i < dicList.length; i++ ) {
+    selectedDicList.push( dicList.item(i).innerText );
+
+  }
+  window.parent.postMessage(selectedDicList.join(),"*");
+
+}
+
+
+function lineAdd() {
+
+  var dicID = document.getElementById("addDicId").value.replace(/(^\s+)|(\s+$)/g, "");
+  var dicName = document.getElementById("addDicName").value.replace(/(^\s+)|(\s+$)/g, "");
+  if ( dicID == "" || dicName == "" ) {
+   alert("入力されていません。");
+   return
+  }
+  document.getElementById("addDicId").value =  "";
+  document.getElementById("addDicName").value  = "";
+
+
+
+  var loObj = document.getElementById("sortable1");
+  var element = document.createElement('li');
+  element.setAttribute( "class","ui-state-default animated FadeInUp" );
+  element.setAttribute( "id", dicID );
+  element.innerHTML = dicName;
+  loObj.appendChild(element); 
+   $( '#sortable1' ) . sortable();
+   $( '#sortable1' ) . disableSelection();
+   $('#sortable1').sortable('disable');
+   $('#sortable1').sortable({
+		items: ':not(.disabled)'
+   });
+  
+
+  setTimeout(function(){
+    element.setAttribute("class","ui-state-default");
+  },500);
+
+}
+
+
+//************* ゴミ箱処理 *************
+
+
+imgTrashEmpty      = "./images/trashEmpty.png";
+imgTrashFull       = "./images/trashFull.png";
+imgTrashEmptyHover = "./images/trashHover.png";      //hover用
+imgTrashFullHover  = "./images/trashFullHover.png";  //hover用
+
+soundIndex = 0;
+
+
+function f_dragstart(event){
+  //ドラッグするデータのid名をDataTransferオブジェクトにセット
+  event.dataTransfer.setData("liIdSave", event.target.id);
+}
+
+/***** ドラッグ要素がドロップ要素に重なっている間の処理 *****/
+function dragoverOnTrash(event){
+  var trashCnt = document.getElementById("divTrash").getElementsByTagName("li").length;
+  if ( trashCnt == 0 ) {
+    document.getElementById("trashImage").src = imgTrashEmptyHover ;
+    document.getElementById("trashCnt").innerHTML = "";
+    document.getElementById("trashCnt").style.padding = "0px";
+
+  } else {
+    document.getElementById("trashImage").src = imgTrashFullHover;
+    document.getElementById("trashCnt").innerHTML = trashCnt;
+    document.getElementById("trashCnt").style.padding = "3px";
+  }
+  //dragoverイベントをキャンセルして、ドロップ先の要素がドロップを受け付けるようにする
+ 
+  event.preventDefault();
+}
+
+/***** ドロップ時の処理 *****/
+function dropIntoTrash(event){
+
+  document.getElementById("intoTrash").play();
+
+  //ドラッグされたデータのid名をDataTransferオブジェクトから取得
+  var id_name = event.dataTransfer.getData("liIdSave");
+  //id名からドラッグされた要素を取得
+  var drag_elm =document.getElementById(id_name);
+  
+//  var loObj = drag_elm.parentNode;
+ // loObj.removeChild(drag_elm);
+
+  drag_elm.setAttribute("onClick","recover(this)");
+
+  //ドロップ先にドラッグされた要素を追加
+  document.getElementById("divTrash").appendChild(drag_elm);
+  //event.currentTarget.appendChild(drag_elm);
+  //エラー回避のため、ドロップ処理の最後にdropイベントをキャンセルしておく
+  event.preventDefault();
+  document.getElementById("trashImage").src = imgTrashFull;
+  var trashCnt = document.getElementById("divTrash").getElementsByTagName("li").length;
+  document.getElementById("trashCnt").innerHTML = trashCnt;
+  document.getElementById("trashCnt").style.padding = "3px";
+
+  document.getElementById("aaa").play();
+
+}
+
+function leaveFromTrash() {
+  var trashCnt = document.getElementById("divTrash").getElementsByTagName("li").length;
+  if ( trashCnt == 0 ) {
+    document.getElementById("trashImage").src = imgTrashEmpty
+    document.getElementById("trashCnt").innerHTML = "";
+    document.getElementById("trashCnt").style.padding = "0px";
+  } else {
+    document.getElementById("trashImage").src = imgTrashFull;
+    document.getElementById("trashCnt").innerHTML = trashCnt;
+    document.getElementById("trashCnt").style.padding = "3px";
+  }
+}
+
+
+function recover(obj) {
+
+  document.getElementById("outOfTrash" + soundIndex ).play();
+  soundIndex++;
+  if ( soundIndex > 4) {
+    soundIndex = 0;
+  }
+
+  var loObj = document.getElementById("sortable3");
+  obj.parentNode.removeChild(obj);
+  obj.setAttribute("onClick","");
+  obj.setAttribute("class","ui-state-default animated FadeInUp");
+  loObj.appendChild(obj); 
+   $('#sortable3').sortable();
+   $('#sortable3').disableSelection();
+   $('#sortable3').sortable('disable');
+   $('#sortable3').sortable({
+	items: ':not(.disabled)'
+   });
+
+  var liCnt = document.getElementById("divTrash").getElementsByTagName("li").length;
+  if ( liCnt == 0 ) {
+    document.getElementById("trashImage").src = imgTrashEmpty;
+    $( "#dialog" ).dialog( "close" );
+    document.getElementById("trashCnt").innerHTML = "";
+    document.getElementById("trashCnt").style.padding = "0px";
+  } else {
+    var trashCnt = document.getElementById("divTrash").getElementsByTagName("li").length;
+    document.getElementById("trashCnt").innerHTML = trashCnt;
+    document.getElementById("trashCnt").style.padding = "3px";
+  }
+  setTimeout(function(){
+    obj.setAttribute("class","ui-state-default");
+  },500);
+
+}
+
+
+
+
+
+  $(function() {
+    $( "#dialog" ).dialog({
+      autoOpen: false,
+      show: {
+        effect: "explode",
+        duration: 1000
+      },
+      hide: {
+        effect: "explode",
+        duration: 1000
+      }
+    });
+ 
+    $( "#opener" ).click(function() {
+      $( "#dialog" ).dialog( "open" );
+    });
+  });
+
+
+
+editing = false;
+function changeName(obj) {
+
+  if (editing) {
+    return;
+  }
+  editing = true;
+  var elm = obj.innerHTML;
+  var inputTag = document.createElement('input');
+  inputTag.setAttribute("type","text");
+  inputTag.setAttribute("size","22");
+  inputTag.setAttribute("class","rounded animated fadeIn");
+  inputTag.setAttribute("value",elm);
+  inputTag.setAttribute("onMouseOut","decideName(this)");
+  inputTag.setAttribute("onblur","decideName(this)");
+  obj.innerHTML = "";
+  obj.appendChild(inputTag);
+  inputTag.focus();
+
+}
+
+function decideName(obj) {
+  var name = obj.value;
+  var liNode = obj.parentNode;
+  liNode.removeChild( obj );
+  liNode.innerHTML = name;
+
+  editing = false;
+}
+
+</script>
+</head>
+<body>
+<br />
+
+<table border="0" >
+<tr>
+<td>使用</td><td>未使用</td><td>非表示</td></tr>
+<tr><td width="500px" valign="top">
+
+<ol id="sortable1" class="rectangle-list">
+
+<li class="ui-state-default" id="d1" ondragstart="f_dragstart(event)" onClick="changeName(this)">基本</li>
+<li class="ui-state-default" id="d2" ondragstart="f_dragstart(event)" onClick="changeName(this)">基礎医学</li>
+<li class="ui-state-default" id="d3" ondragstart="f_dragstart(event)" onClick="changeName(this)">精神医学</li>
+<li class="ui-state-default" id="d4" ondragstart="f_dragstart(event)" onClick="changeName(this)">歯学</li>
+<li class="ui-state-default" id="d5" ondragstart="f_dragstart(event)" onClick="changeName(this)">薬学</li>
+</ol>
+<span class="caption">追加</span><input type="text" size="12" id="addDicId"  placeholder='辞書IDを入力' class='rounded'/>
+<input type="text" size="22" id="addDicName"  placeholder='辞書名を入力' class='rounded'/>
+<a href="#" class="button play"  onClick="return lineAdd()">追加</a><br />
+
+</td>
+<td valign="top" width="200px" >
+<ol id="sortable2" class="rounded-list">
+
+    <li class="ui-state-default" id="d10" ondragstart="f_dragstart(event)" onClick="changeName(this)">感覚器</li>
+<li class="ui-state-default" id="d11" ondragstart="f_dragstart(event)" onClick="changeName(this)">公衆衛生</li>
+<li class="ui-state-default" id="d12" ondragstart="f_dragstart(event)" onClick="changeName(this)">電気電子</li>
+<li class="ui-state-default" id="d13" ondragstart="f_dragstart(event)" onClick="changeName(this)">旅行会話</li>
+<li class="ui-state-default" id="d14" ondragstart="f_dragstart(event)" onClick="changeName(this)">臨床医学</li>
+</ol>
+<div id="dropbox" onDragOver="dragoverOnTrash(event)" onDrop="dropIntoTrash(event)" onDragLeave="leaveFromTrash()">
+<br /><br /><br /><br /><br />
+<img src="./images/trashEmpty.png" id="trashImage" onClick=" $( '#dialog' ).dialog( 'open' );"/>
+<span id="trashCnt" class="caption rounded" style="font-size:0.5em;float:left;background-color:#ff3333;color:#fff;padding:0px;"></span>
+</div>
+</td>
+
+
+<td valign="top"  width="200px">
+
+<div style="padding:1px 1px;"></div>
+<ol id="sortable3" class="nonSelected">
+<li class="ui-state-default" id="d21" ondragstart="f_dragstart(event)" onClick="changeName(this)">111</li>
+<li class="ui-state-default" id="d22" ondragstart="f_dragstart(event)" onClick="changeName(this)">222</li>
+<li class="ui-state-default" id="d23" ondragstart="f_dragstart(event)" onClick="changeName(this)">333333333</li>
+<li class="ui-state-default" id="d24" ondragstart="f_dragstart(event)" onClick="changeName(this)">444</li>
+<li class="ui-state-default" id="d25" ondragstart="f_dragstart(event)" onClick="changeName(this)">5555</li>
+<li class="ui-state-default" id="d26" ondragstart="f_dragstart(event)" onClick="changeName(this)">6666</li>
+<li class="ui-state-default" id="d27" ondragstart="f_dragstart(event)" onClick="changeName(this)">7777</li>
+<li class="ui-state-default" id="d28" ondragstart="f_dragstart(event)" onClick="changeName(this)">888888</li>
+</ol>
+
+
+
+
+
+</td>
+</tr></table>
+
+
+<div id="dialog" title="　　ゴミ箱">
+<ol id="divTrash" class="rounded-list fire"> <!-- rounded-list -->
+
+</ol>
+</div>
+
+
+<!-- Sound Effect -->
+<!-- ゴミ箱へ入れる -->
+<audio id="intoTrash" preload="auto">
+<source src="./SE/a05.mp3" type="audio/mp3"/>
+<source src="./SE/a05.ogg" type="audio/ogg"/>
+<source src="./SE/a05.wav" type="audio/wav"/>
+</audio>
+
+<!-- ゴミ箱から取り出す -->
+<audio id="outOfTrash0" preload="auto">
+<source src="./SE/a08.mp3" type="audio/mp3"/>
+<source src="./SE/a08.ogg" type="audio/ogg"/>
+<source src="./SE/a08.wav" type="audio/wav"/>
+</audio>
+<audio id="outOfTrash1" preload="auto">
+<source src="./SE/a08.mp3" type="audio/mp3"/>
+<source src="./SE/a08.ogg" type="audio/ogg"/>
+<source src="./SE/a08.wav" type="audio/wav"/>
+</audio>
+<audio id="outOfTrash2" preload="auto">
+<source src="./SE/a08.mp3" type="audio/mp3"/>
+<source src="./SE/a08.ogg" type="audio/ogg"/>
+<source src="./SE/a08.wav" type="audio/wav"/>
+</audio>
+<audio id="outOfTrash3" preload="auto">
+<source src="./SE/a08.mp3" type="audio/mp3"/>
+<source src="./SE/a08.ogg" type="audio/ogg"/>
+<source src="./SE/a08.wav" type="audio/wav"/>
+</audio>
+<audio id="outOfTrash4" preload="auto">
+<source src="./SE/a08.mp3" type="audio/mp3"/>
+<source src="./SE/a08.ogg" type="audio/ogg"/>
+<source src="./SE/a08.wav" type="audio/wav"/>
+</audio>
+
+</body>
+</html>
