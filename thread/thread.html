@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+
+<script type="text/javascript">
+
+const START = " スレッド起動してみる ";
+const STOP  = " じっとしていて欲しい ";
+
+
+
+var worker;
+var prime = 3;
+
+function controlThread(obj) {
+
+  if (obj.value == START) {
+     obj.value= STOP;
+     startThread();
+  } else {
+     obj.value= START;
+     stopThread();
+  }
+}
+function startThread() {
+  
+  if (worker) {
+    worker.terminate();
+  }
+  var dispSpan = document.getElementById('./js/prime');
+
+
+  worker = new Worker('./js/prime.js');
+  worker.addEventListener('message', function(e) {
+    dispSpan.innerHTML= prime = e.data;
+  }, false);
+  worker.postMessage(prime);
+
+}
+
+
+function stopThread() {
+  worker.postMessage('stop');
+  setInterval( function(){
+  //worker.terminate();
+  }, 10);
+
+}
+</script>
+</head>
+<body>
+<br /><br /><br /><br />
+Threadをテストしてみる
+<input type="button" id="button" onclick="controlThread(this);" /><br /><br />
+
+<input type="text" size="100" /><br />
+素数かも→<span id="prime"></span>
+<br /><br />
+<canvas id="canvas" width="640" height="920"></canvas>
+
+<script type="text/javascript">
+ document.getElementById('button').value = START;
+
+	x1=y1=c1=100;
+	x1k=y1k=1;
+	c1k=-1;
+
+	x2=y2=250
+	x2k=y2k=-1;
+	c2=200;
+	c2k=2;
+
+setInterval( function(){
+	var canvas=document.getElementById("canvas");
+	var ctx=canvas.getContext("2d");
+
+	x1k=x1>440?-1:(x1<=0?1:x1k);
+	y1k=y1>720?-1:(y1<=0?1:y1k);
+	c1k=c1>100?-1:(c1<=20?1:c1k);
+	x2k=x2>440?-1:(x2<=0?1:x2k);
+	y2k=y2>720?-2:(y2<=0?2:y2k);
+	c2k=c2>200?-1:(c2<=30?1:c2k);
+
+	x1+=x1k;
+	y1+=y1k;
+	c1+=c1k;
+	x2+=x2k;
+	y2+=y2k;
+	c2+=c2k;
+
+	var g=ctx.createRadialGradient(x1,y1,c1 ,x2,y2,c2);
+	g.addColorStop(0.2,"red");
+	g.addColorStop(0.6,"yellow");
+	g.addColorStop(0.8,"green");
+	g.addColorStop(1.0,"blue");
+	ctx.fillStyle=g;
+	ctx.fillRect(20,20,500,600);
+
+},20);
+</script>
+</body>
+</html>
